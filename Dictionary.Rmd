@@ -1,0 +1,75 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "13 4 2023"
+output: html_document
+---
+
+```{r setup, warning=FALSE,echo=FALSE}
+library(devtools)
+library(popdictR)
+library(lubridate)
+library(quanteda)
+library(dplyr)
+library(tidyverse)
+library(tm)
+library(qdap)
+library(readr)
+library(gt)
+library(manifestoR)
+devtools::install_github("cosimameyer/overviewR")
+devtools::install_github("jogrue/regexhelpeR")
+devtools::install_github("jogrue/multidictR")
+
+```
+###Datensatz einlesen
+
+```{r}
+df_2019 <- readRDS("~/Documents/Uni Stuttgart/Hausarbeit 5. Semester/speeches_2019.RDS")
+df_2019$date <- 2019
+df_2017 <- readRDS("~/Documents/Uni Stuttgart/Hausarbeit 5. Semester/speeches_2017.RDS")
+df_2017$date <- 2017
+df_2014 <- readRDS("~/Documents/Uni Stuttgart/Hausarbeit 5. Semester/speeches_2014.RDS")
+df_2014$date <- 2014
+df_complete <- readRDS("~/Documents/Uni Stuttgart/Hausarbeit 5. Semester/speeches_complete.RDS")
+```
+
+### Corpus 2019, 2017 und 2014
+```{r, warning=FALSE,echo=FALSE}
+
+#2019
+corp_2019 <- corpus(df_2019, text_field = "speech_content")
+
+result1 <- run_popdict(corp_2019) 
+result2 <- run_other_popdicts(corp_2019, include_totals = FALSE)
+
+result1_2019 <- convert(result1, to = "data.frame")
+result2_2019 <- convert(result2, to = "data.frame")
+result_2019 <- bind_cols(result1_2019,select(result2_2019, dict_rooduijn_pauwels_2011, dict_pauwels_2017))
+
+#2017
+corp_2017 <- corpus(df_2017, text_field = "speech_content")
+
+result1 <- run_popdict(corp_2017) 
+result2 <- run_other_popdicts(corp_2017, include_totals = FALSE)
+
+result1_2017 <- convert(result1, to = "data.frame")
+result2_2017 <- convert(result2, to = "data.frame")
+result_2017 <- bind_cols(result1_2017,select(result2_2017, dict_rooduijn_pauwels_2011, dict_pauwels_2017))
+                         
+#2014
+
+corp_2014 <- corpus(df_2014, text_field = "speech_content")
+
+result1 <- run_popdict(corp_2014)
+result2 <- run_other_popdicts(corp_2014, include_totals = FALSE)
+
+result1_2014 <- convert(result1, to = "data.frame")
+result2_2014 <- convert(result2, to = "data.frame")
+result_2014 <- bind_cols(result1_2014,select(result2_2014, dict_rooduijn_pauwels_2011, dict_pauwels_2017))
+
+
+
+```
+
+
