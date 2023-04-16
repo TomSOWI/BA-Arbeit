@@ -69,7 +69,7 @@ result2_2014 <- convert(result2, to = "data.frame")
 result_2014 <- bind_cols(result1_2014,select(result2_2014, dict_rooduijn_pauwels_2011, dict_pauwels_2017))
 
 
-
+vjhvjh
 ```
 
 
