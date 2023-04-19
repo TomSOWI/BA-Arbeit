@@ -73,12 +73,12 @@ BT17 <- dbGetQuery(con,
                         AND NOT abbreviation = 'not found';")
 #27. Oktober 2009 und dem 22. Oktober 2013
 
-df17_20 <- dbGetQuery(con,
+BT17_20 <- dbGetQuery(con,
                        "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
                         FROM open_discourse.speeches AS s
                         INNER JOIN open_discourse.factions AS f ON
                         s.faction_id = f.id
-                        WHERE date >= '2009-10-27' '
+                        WHERE date >= '2009-10-27' 
                         AND NOT abbreviation = 'not found';")
 
 

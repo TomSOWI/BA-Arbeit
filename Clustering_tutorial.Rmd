@@ -1,0 +1,113 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "19 4 2023"
+output: html_document
+---
+
+### Wortcluster
+
+```{r}
+df_aberwitzig <- df[df$pattern == "aberwitzig(e|er|es|en|em)?",]
+
+
+tdm <- tm::DocumentTermMatrix(df_aberwitzig$sentence)
+```
+
+
+```{r}
+tdm.tfidf <- tm::weightTfIdf(tdm)
+tdm.tfidf <- tm::removeSparseTerms(tdm.tfidf, 0.999) 
+tfidf.matrix <- as.matrix(tdm.tfidf) 
+# Cosine distance matrix (useful for specific clustering algorithms) 
+dist.matrix = proxy::dist(tfidf.matrix, method = "cosine")
+```
+
+### Clustering
+```{r}
+truth.K = 2
+
+clustering.kmeans <- kmeans(tfidf.matrix, truth.K) # wie viele dimensionen?
+```
+
+
+```{r}
+clustering.hierarchical <- hclust(dist.matrix, method = "ward.D2")
+```
+
+
+```{r}
+clustering.dbscan <- dbscan::hdbscan(dist.matrix, minPts = 10)
+```
+
+
+```{r Stacking clustering initialization}
+master.cluster <- clustering.kmeans$cluster
+slave.hierarchical <- cutree(clustering.hierarchical, k = truth.K)
+slave.dbscan <- clustering.dbscan$cluster
+# Preparing the stacked clustering
+stacked.clustering <- rep(NA, length(master.cluster)) 
+names(stacked.clustering) <- 1:length(master.cluster)
+```
+
+- Then, for each cluster label in the *master* clustering, we recursively hard vote the cluster on each slave, meaning that we define the corresponding stacked clustering as the most found label on the first cluster, then the most found label of the previous found label in the second cluster.
+- This may result in big clusters, which is a risk of an hard-vote stacking clustering. 
+- It is of course not the perfect solution to stack clusterings, but an easy one to implement in R
+
+```{r Stacking clustering execution}
+for (cluster in unique(master.cluster)) {
+  indexes = which(master.cluster == cluster, arr.ind = TRUE)
+  slave1.votes <- table(slave.hierarchical[indexes])
+  slave1.maxcount <- names(slave1.votes)[which.max(slave1.votes)]
+  
+  slave1.indexes = which(slave.hierarchical == slave1.maxcount, arr.ind = TRUE)
+  slave2.votes <- table(slave.dbscan[indexes])
+  slave2.maxcount <- names(slave2.votes)[which.max(slave2.votes)]
+  
+  stacked.clustering[indexes] <- slave2.maxcount
+}
+```
+
+# 5. Plotting the results
+
+Plotting is one of the best features of R in my opinion. Compared to Python, I find R more convenient, comfortable and easier to create, store and save plots of every kind.
+The native solution is enough complete to cover most of the basics features of a plot. 
+For more aesthetic and complex requirements, it exists the famous *ggplot2* package. It is widely used but a lot less accessible in its usage interface.
+
+To plot our clustering, as our feature spaces is highly dimensional (TF-IDF representation), we will reduce it to 2 thanks to the multi-dimensional scaling.
+This technique is dependent of our distance metric, but in our case with TF-IDF, it is highly preferable than the famous PCA technique.
+
+```{r Plotting}
+points <- cmdscale(dist.matrix, k = 2) # Running the PCA
+palette <- colorspace::diverge_hcl(truth.K) # Creating a color palette
+previous.par <- par(mfrow=c(2,2), mar = rep(1.5, 4)) # partitionning the plot space
+plot(points,
+     main = 'K-Means clustering',
+     col = as.factor(master.cluster),
+     mai = c(0, 0, 0, 0),
+     mar = c(0, 0, 0, 0),
+     xaxt = 'n', yaxt = 'n',
+     xlab = '', ylab = '')
+plot(points,
+     main = 'Hierarchical clustering',
+     col = as.factor(slave.hierarchical),
+     mai = c(0, 0, 0, 0),
+     mar = c(0, 0, 0, 0),
+     xaxt = 'n', yaxt = 'n',
+     xlab = '', ylab = '')
+plot(points,
+     main = 'Density-based clustering',
+     col = as.factor(slave.dbscan),
+     mai = c(0, 0, 0, 0),
+     mar = c(0, 0, 0, 0),
+     xaxt = 'n', yaxt = 'n',
+     xlab = '', ylab = '')
+plot(points,
+     main = 'Stacked clustering',
+     col = as.factor(stacked.clustering),
+     mai = c(0, 0, 0, 0),
+     mar = c(0, 0, 0, 0),
+     xaxt = 'n', yaxt = 'n',
+     xlab = '', ylab = '')
+par(previous.par) # recovering the original plot space parameters
+```
