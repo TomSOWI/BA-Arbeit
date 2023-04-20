@@ -6,12 +6,13 @@ output: html_document
 ---
 
 ```{r setup, warning=FALSE,echo=FALSE}
-install.packages("dbscan")
+
 library(quanteda)
 library(quanteda.textplots)
 library(tidyverse)
 library(wordcloud2)
 library(dbscan)
+library(tm)
 devtools::install_github("jogrue/regexhelpeR")
 devtools::install_github("jogrue/multidictR")
 devtools::install_github("jogrue/popdictR")
@@ -25,6 +26,7 @@ token_BT20 <- tokens(corp_BT20,  remove_number =T)
 class(token_BT20)
 
 #Cleaning
+
 token_BT20 <- tokens_remove(token_BT20 , stopwords("german"))
 token_BT20 <- tokens_remove(token_BT20 , c(".","!","?"))
 token_BT20 <- tokens_remove(token_BT20, c("„", "“","–", "–", "…", "@","(",")","{","}",",",":","-",";"))

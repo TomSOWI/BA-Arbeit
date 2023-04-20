@@ -1,0 +1,77 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "19 4 2023"
+output: html_document
+---
+### Cluster with all words
+
+```{r}
+corp_BT17_20 <- corpus(BT17_20, text_field = "speech_content") #Corpus hier ändern
+token_BT17_20 <- tokens(corp_BT17_20,  remove_number =T)
+
+#i <- tm::Corpus(VectorSource(token_BT17_20))
+class(token_BT17_20)
+```
+
+#### Cleaning quanteda
+
+```{r}
+
+token_BT17_20 <- tokens_remove(token_BT17_20 , stopwords("german"))
+token_BT17_20 <- tokens_wordstem(token_BT17_20, language = quanteda_options("language_stemmer"))
+token_BT17_20 <- tokens_remove(token_BT17_20 , c(".","!","?"))
+token_BT17_20 <- tokens_remove(token_BT17_20, c("„", "“","–", "–", "…", "@","(",")","{","}",",",":","-",";"))
+token_BT17_20 <- tokens_remove(token_BT17_20, '"')
+token_BT17_20 <- tokens_wordstem(token_BT17_20, language = quanteda_options("language_stemmer"))
+#dfm_wordstem()
+```
+
+#### Cleaning tm
+```{r}
+corp_BT17_20 <- tm::Corpus(VectorSource(corp_BT17_20))
+corp_BT17_20 <- tm_map(corp_BT17_20, stripWhitespace)
+corp_BT17_20 <- tm_map(corp_BT17_20, removePunctuation)
+corp_BT17_20 <- tm_map(corp_BT17_20, content_transformer(tolower))
+corp_BT17_20 <- tm_map(corp_BT17_20, removeWords, stopwords("german"))
+corp_BT17_20 <- tm_map(corp_BT17_20, stemDocument(language = "german"))
+corp_BT17_20 <- tm_map(corp_BT17_20, removeWords, c("„", "“","–", "–","(",")","{","}",",",":","-",";"))
+corp_BT17_20 <- tm_map(corp_BT17_20, removeWords, c("!","?"))
+
+inspect(corp_BT17_20)
+```
+
+
+### Kontext Dictionary
+
+```{r}
+dict <- dictionary(list(populismus = terms))
+is.dictionary(dict)
+
+#df_BT17_20 <- kwic(token_BT17_20, pattern = dict$populismus, valuetype = "regex", window = 5) #window 
+df_BT17_20 <- kwic(corp_BT17_20, pattern = dict$populismus, valuetype = "regex") #CORPUS
+
+quanteda::tokens_wordstem
+
+(df_BT17_20)
+
+df <- df_BT17_20 %>%
+  group_by(pattern,keyword) %>%
+  reframe(
+    previous = pre,
+    after = post
+    #sentence = paste0(df_BT17_20$pre, df_BT17_20$keyword, df_BT17_20$post, sep = " ")
+  )
+
+
+df$context = paste(df$previous, df$after, sep = " ")
+#Sentence level
+df$sentence = paste(df$previous, df$keyword,  sep = " ")
+df$sentence = paste(df$sentence, df$after,  sep = " ")
+```
+
+### Vektorisierung des Corpus
+```{r}
+tm::
+```
+
