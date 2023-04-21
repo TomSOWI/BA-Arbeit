@@ -9,8 +9,6 @@ output: html_document
 ```{r}
 corp_BT17_20 <- corpus(BT17_20, text_field = "speech_content") #Corpus hier ändern
 token_BT17_20 <- tokens(corp_BT17_20,  remove_number =T)
-
-#i <- tm::Corpus(VectorSource(token_BT17_20))
 class(token_BT17_20)
 ```
 
@@ -45,13 +43,14 @@ inspect(corp_BT17_20)
 ### Kontext Dictionary
 
 ```{r}
+terms <- popdictR::gruendl_terms
 dict <- dictionary(list(populismus = terms))
 is.dictionary(dict)
 
-#df_BT17_20 <- kwic(token_BT17_20, pattern = dict$populismus, valuetype = "regex", window = 5) #window 
-df_BT17_20 <- kwic(corp_BT17_20, pattern = dict$populismus, valuetype = "regex") #CORPUS
+df_BT17_20 <- kwic(token_BT17_20, pattern = dict$populismus, valuetype = "regex", window = 5) #window 
+#df_BT17_20 <- kwic(corp_BT17_20, pattern = dict$populismus, valuetype = "regex") #CORPUS
 
-quanteda::tokens_wordstem
+
 
 (df_BT17_20)
 
@@ -70,8 +69,70 @@ df$sentence = paste(df$previous, df$keyword,  sep = " ")
 df$sentence = paste(df$sentence, df$after,  sep = " ")
 ```
 
+
+```{r}
+dtm <- tm::DocumentTermMatrix(df$sentence) #oder termDocumentMatrix
+```
+
+
+
 ### Vektorisierung des Corpus
 ```{r}
-tm::
+dtm <- tm::weightTfIdf(dtm) #inverse document frequency --> accounts for the frequency of words
+#tm::weightTf()  #document frequency --> accounts for the frequency of words
+dtm <- tm::removeSparseTerms(dtm, 0.999) # 1 ist mnaximale sparsity
+dtm.matrix <- as.matrix(dtm) 
+
+```
+
+### Distance measure
+```{r}
+#Available methdos 
+methods <- proxy::pr_DB
+summary(methods)
+methods$get_entry("euclidean")
+methods$get_entry("cosine")
+methods$get_entry("jaccard")
+
+# Cosine distance matrix (useful for specific clustering algorithms) 
+dist.matrix = proxy::dist(dtm.matrix, method = "euclidean")
+
+
+
+```
+
+###-Means Cluster
+
+```{r}
+set.seed(123)
+truth.K = 2  # wie viele dimensionen?
+
+clustering.kmeans <- kmeans(dist.matrix, truth.K, iter.max = 10, nstart = 2)
+
+print(clustering.kmeans)
+
+library(ggplot2)
+library(factoextra)
+library(FactoMineR)
+library(here)
+
+class(dist.matrix)
+
+fviz_nbclust(dtm.matrix, kmeans, method = "wss") +    # total intra-cluster variation
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+```
+
+### Validierung
+```{r}
+
+#wie viele AfD Beiträge pro Cluster?
+```
+
+
+
+# Clusteranalyse nach Bundestagswahljahre
+```{r}
+
 ```
 
