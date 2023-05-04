@@ -1,0 +1,194 @@
+---
+title: "Preprocessing"
+author: "Tom Klotz"
+date: "3 5 2023"
+output: html_document
+---
+
+
+
+## Test Case foor creating functions
+### Cleaning and keeping docvars
+```{r}
+corp_test <- corpus(testing$speech_content, 
+                      docvars = data.frame(docname = testing$id, party = testing$party))
+
+toks <- tokens(corp_test, remove_punct = T, remove_symbols = T, remove_numbers = T)
+toks <- tokens_tolower(toks)
+toks <- tokens_remove(toks, stopwords("german"))
+
+corp_test <- vapply(toks, paste, FUN.VALUE = character(1), collapse = " ") %>%corpus()
+
+df <- cbind(corp_test, docvars(toks))
+rownames(df) <- df$docname
+
+corp_test <- corpus(df, text_field = "corp_test") 
+
+```
+
+
+```{r}
+#Dictionary context
+terms <- popdictR::gruendl_terms
+dict <- dictionary(list(populismus = terms))
+is.dictionary(dict) #true
+
+
+df_kwic <- kwic(corp_test, pattern = dict$populismus, valuetype = "regex", window = 5)
+
+#combine pre and after
+df_kwic$context <- paste(df_kwic$pre, df$post, sep = " ")
+df_kwic$sentence <- paste(df_kwic$pre, df$post,  sep = " ")
+df_kwic$sentence <- paste(df_kwic$sentence, df$post,  sep = " ")
+
+df_kwic <- as.data.frame(df_kwic) %>% select(docname,pattern,context)
+
+
+df$corp_test <- NULL
+class(df_kwic$docname) == class(df$docname) #false
+df$docname  <- as.character(df$docname)
+class(df_kwic$docname) == class(df$docname) #true
+
+df_test <- merge(df_kwic, df) #add party column
+
+
+
+
+```
+
+
+### Distance measure
+```{r}
+toks <- tokens(df_test$context)
+
+dfm_test <- quanteda::dfm(toks)
+dtm.matrix <- as.matrix(dfm_test) 
+
+
+dist_test = proxy::dist(dtm.matrix, method = "euclidean")
+
+
+
+```
+
+### K-Means
+```{r}
+set.seed(123)
+truth.K = 2  # wie viele dimensionen?
+
+clustering.kmeans <- kmeans(dist_test, truth.K, iter.max = 10, nstart = 2)
+
+print(clustering.kmeans)
+
+class(dist.matrix)
+
+fviz_nbclust(dtm.matrix, kmeans, method = "wss") +    # total intra-cluster variation
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+```
+
+
+```{r}
+df_complete$cluster <- clustering.kmeans$cluster
+###Anteil AfD und Linke
+
+
+
+
+  
+df_afd <- df_complete[df_complete$party == "AfD",] 
+
+prop.table(table(df_afd$cluster))
+
+df_linke <- df_complete[df_complete$party == "DIE LINKE.",] 
+
+prop.table(table(df_linke$cluster))
+
+#1 is populism
+#2 is not populism
+
+df_complete$cluster[df_complete$cluster == 2] <- 0
+```
+
+
+```{r}
+
+
+df_aggre <- aggregate(df_complete$cluster, by = list(df_complete$pattern), FUN = "mean")
+
+
+
+```
+
+
+### Functions
+```{r, echo=FALSE}
+#Cleaning
+corpus_cleaning <- function(df){
+  corp <- corpus(df$speech_content, docvars = data.frame(docname = testing$id, party = testing$party))
+  toks <- tokens(corp, remove_punct = T, remove_symbols = T, remove_numbers = T, include_docvars = T)
+  toks <- tokens_tolower(toks)
+  toks <- tokens_remove(toks, stopwords("german"))
+  corp <- vapply(toks, paste, FUN.VALUE = character(1), collapse = " ") %>%
+  corpus()
+  df <- cbind(corp, docvars(toks)) #notwendig für die folgende Funktion
+  rownames(df) <- df$docname
+  assign("df", df,  envir = globalenv())
+  corp <- corpus(df, text_field = "corp")
+}
+
+#Dictionary context
+terms <- popdictR::gruendl_terms
+dict <- dictionary(list(populismus = terms))
+is.dictionary(dict)
+
+corpus_to_poppulism_context_df <- function(corp){
+  df_kwic <- kwic(corp, pattern = dict$populismus, valuetype = "regex", window = 5) #window 
+  #combine pre and after
+  df_kwic$context <- paste(df_kwic$pre, df$post, sep = " ")
+  df_kwic$sentence <- paste(df_kwic$pre, df$post,  sep = " ")
+  df_kwic$sentence <- paste(df_kwic$sentence, df$post,  sep = " ")
+  df_kwic <- as.data.frame(df_kwic) %>% select(docname,pattern,context)
+  df$corp <- NULL
+  df$docname  <- as.character(df$docname)
+  df_complete <- merge(df_kwic, df) #add party colum
+}
+
+distance.matrix <- function(df){
+  toks <- tokens(df$context)
+  dfm <- dfm(toks)
+  dtm.matrix <- as.matrix(dfm)
+  dist.matrix <- proxy::dist(dtm.matrix, method = "euclidean")
+}
+
+```
+
+### Verifying that functions produce the same output
+
+```{r}
+corp_verify <- corpus_cleaning(testing)
+corp_verify == corp_test #check
+
+df_verify <- corpus_to_poppulism_context_df(corp_verify)
+df_verify == df_test #check
+
+dist_verify <- distance.matrix(df_verify)
+dist_verify == dist_test #check
+
+
+```
+
+```{r}
+#Lemmitazation
+#download german ud model
+#ud_model <- udpipe_download_model("german")
+#ud_model <- udpipe_load_model(ud_model)
+
+#tokens_lemm <- function(toks){
+#  char <- as.character(toks)
+#stem <- udpipe_annotate(ud_model, char)
+#  df <- as.data.frame(stem)
+  #toks <- tokens(df$lemma)
+#}
+```
+

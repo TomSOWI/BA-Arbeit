@@ -1,0 +1,95 @@
+---
+title: "SQL_Datenabfragen"
+author: "Tom Klotz"
+date: "13 4 2023"
+output: html_document
+---
+
+
+
+```{r, eval=FALSE}
+# db_connection -----------------------------------------------------------
+db <- "next"
+host_db <- "localhost"
+db_port <- "5432"
+db_user <- "postgres"
+db_password <- "postgres"
+con <-
+  RPostgreSQL::dbConnect(
+    RPostgres::Postgres(),
+    dbname = db,
+    host = host_db,
+    port = db_port,
+    user = db_user,
+    password = db_password
+  )
+?dbConnect
+# get data tables ---------------------------------------------------------
+
+testing <- dbGetQuery(con,
+                       "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
+                        FROM open_discourse.speeches AS s
+                        INNER JOIN open_discourse.factions AS f ON
+                        s.faction_id = f.id
+                        WHERE date ='2022-11-09' 
+                        AND NOT abbreviation = 'not found';")
+
+BT20 <- dbGetQuery(con,
+                       "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
+                        FROM open_discourse.speeches AS s
+                        INNER JOIN open_discourse.factions AS f ON
+                        s.faction_id = f.id
+                        WHERE date >='2021-10-26' 
+                        AND NOT abbreviation = 'not found';")
+#since 26. Oktober 2021
+BT19 <- dbGetQuery(con,
+                       "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
+                        FROM open_discourse.speeches AS s
+                        INNER JOIN open_discourse.factions AS f ON
+                        s.faction_id = f.id
+                        WHERE date BETWEEN '2017-10-24' AND '2021-10-25'
+                        AND NOT abbreviation = 'not found';")
+#24. Oktober 2017 bis zum 26. Oktober 2021
+BT18 <- dbGetQuery(con,
+                       "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
+                        FROM open_discourse.speeches AS s
+                        INNER JOIN open_discourse.factions AS f ON
+                        s.faction_id = f.id
+                        WHERE date BETWEEN '2013-10-22' AND '2017-10-23'
+                        AND NOT abbreviation = 'not found';")
+#22.Oktober 2013 bis zum 24. Oktober 2017
+
+
+
+BT17 <- dbGetQuery(con,
+                       "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
+                        FROM open_discourse.speeches AS s
+                        INNER JOIN open_discourse.factions AS f ON
+                        s.faction_id = f.id
+                        WHERE date BETWEEN '2009-10-27' AND '2013-10-21'
+                        AND NOT abbreviation = 'not found';")
+#27. Oktober 2009 und dem 22. Oktober 2013
+
+BT17_20 <- dbGetQuery(con,
+                       "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
+                        FROM open_discourse.speeches AS s
+                        INNER JOIN open_discourse.factions AS f ON
+                        s.faction_id = f.id
+                        WHERE date >= '2009-10-27' 
+                        AND NOT abbreviation = 'not found';")
+
+
+#saveRDS(df_complete,file = "speeches_complete.RDS")
+#saveRDS(df_2014,file = "speeches_2014.RDS")
+#saveRDS(df_2017,file = "speeches_2017.RDS")
+#saveRDS(df_2019,file = "speeches_2019.RDS")
+
+
+
+
+
+
+
+```
+
+

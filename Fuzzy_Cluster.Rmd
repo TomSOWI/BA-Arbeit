@@ -1,0 +1,16 @@
+---
+title: "Fuzzy Clustering"
+author: "Tom Klotz"
+date: "22 4 2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+
+```
+
+```{r}
+
+```
+
