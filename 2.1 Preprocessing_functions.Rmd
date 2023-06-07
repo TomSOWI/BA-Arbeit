@@ -179,7 +179,7 @@ dict_total <- dictionary(list(populismus = terms_total$Word))
 
 
 corpus_to_poppulism_context_df <- function(corp){
-  df_kwic <- kwic(corp, pattern = dict$populismus, valuetype = "regex", window = 5) #window 
+  df_kwic <- kwic(corp, pattern = dict, valuetype = "regex", window = 5) #window 
   #combine pre and after
   df_kwic$context <- paste(df_kwic$pre, df_kwic$post, sep = " ")
   df_kwic <- as.data.frame(df_kwic) %>% select(docname,pattern,context)
@@ -189,7 +189,7 @@ corpus_to_poppulism_context_df <- function(corp){
 }
 
 corpus_to_poppulism_context_df_total <- function(corp){
-  df_kwic <- kwic(corp, pattern = dict_total$populismus, valuetype = "regex", window = 5) #window 
+  df_kwic <- kwic(corp, pattern = dict_total, valuetype = "regex", window = 5) #window 
   #combine pre and after
   df_kwic$context <- paste(df_kwic$pre, df_kwic$post, sep = " ")
   df_kwic <- as.data.frame(df_kwic) %>% select(docname,pattern,context)

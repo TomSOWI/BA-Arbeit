@@ -114,12 +114,12 @@ df_kmeans$cluster[df_kmeans$cluster == 2] <- 0
  
 df_kmeans_aggr <- aggregate(df_kmeans$cluster, by = list(df_kmeans$pattern), FUN = "mean")
 
-#Als gewichtetes Diktionär bereit
 
+colnames(df_kmeans_aggr) <- c("pattern","weight")
 
  
 
-saveRDS(df_kmeans_aggr, file = "dict_kmeans.RDS")
+#saveRDS(df_kmeans_aggr, file = "dict_kmeans.RDS")
  
 
 ```
@@ -147,13 +147,13 @@ terms_nomatch <- terms[! terms %in% terms_kmeans]
  
 ```{r}
  
-102
+
 df_kmeans_dict <- df_kmeans_aggr[df_kmeans_aggr$x >= 0.5,]
  
 103
 terms_kmeans_weighted <- as.character(df_kmeans_dict$Group.1)
  
-104
+
 ```
 
 ```{r}

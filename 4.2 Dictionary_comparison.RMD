@@ -133,7 +133,7 @@ result1_2014 <- convert(result1, to = "data.frame")
 result2_2014 <- convert(result2, to = "data.frame")
 result3_2014 <- convert(result3, to = "data.frame")
 result4_2014 <- convert(result4, to = "data.frame")
-result_2014 <- bind_cols(result1_2014,select(result2_2014, dict_rooduijn_pauwels_2011, dict_pauwels_2017),select(result3_2014, gruendl_2), select(result4_2014, gruendl_3))
+result_2014 <- bind_cols(result1_2014,select(result2_2014, dict_rooduijn_pauwels_2011, dict_pauwels_2017))#,select(result3_2014, gruendl_2), select(result4_2014, gruendl_3))
 
 t <- result_2014$gruendl_3 == result_2014$gruendl_2
 
@@ -165,6 +165,8 @@ df_kwic_fixed <- kwic(corp_2014, pattern = dict_fixed$populismus, valuetype = "f
 #211
 df_kwic <- rbind(df_kwic_regex,df_kwic_fixed)
 
+
+
 #adding weights of dictionary terms
 df_res <- merge(df_kmeans_aggr,df_kwic, by = "pattern")
 df_res$docid <- as.numeric(str_sub(df_res$docname, start = 5))
@@ -187,5 +189,91 @@ result_2014_weight <- merge(result_2014, df_res1, by = "doc_id")
 
 result_2014_weight$validation <- ifelse(result_2014_weight$dict_gruendl_2020 != 0 & result_2014_weight$kmeans != 0, TRUE, FALSE)
 table(result_2014_weight$validation)
+```
+
+### Test ohne Gewichtung
+```{r}
+df_kwic1<- kwic(corp_2014, pattern = dict, valuetype = "regex", window = 1) #case_insensitive = FALSE)
+df_kwic2<- kwic(corp_2014, pattern = dict$populism, valuetype = "regex", window = 1)
+df_kwic1.1<- kwic(corp_2014, pattern = dict, valuetype = "regex", window = 1, case_insensetive = FALSE)
+df_kwic1.2<- kwic(corp_2014, pattern = dict, valuetype = "regex", window = 1, case_insensetive = TRUE)
+
+
+
+#### nur kurz
+
+#17
+corpBT17 <- tokens_cleaning(BT17)
+corpBT17 <- corpus_cleaning(BT17)
+dfBT17 <- corpus_to_poppulism_context_df(corpBT17)
+distBT17 <- distance.matrix(dfBT17)
+saveRDS(distBT17, file = "distBT17.RDS")
+
+#18
+corpBT18 <- tokens_cleaning(BT18)
+corpBT18 <- corpus_cleaning(BT18)
+dfBT18 <- corpus_to_poppulism_context_df(corpBT18)
+distBT18 <- distance.matrix(dfBT18)
+saveRDS(distBT18, file = "distBT18.RDS")
+
+#19
+corpBT19 <- tokens_cleaning(BT19)
+corpBT19 <- corpus_cleaning(BT19)
+dfBT19 <- corpus_to_poppulism_context_df(corpBT19)
+distBT19 <- distance.matrix(dfBT19)
+saveRDS(distBT19, file = "distBT19.RDS")
+#20
+corpBT20 <- tokens_cleaning(BT20)
+corpBT20 <- corpus_cleaning(BT20)
+dfBT20 <- corpus_to_poppulism_context_df(corpBT20)
+distBT20 <- distance.matrix(dfBT20)
+saveRDS(distBT20, file = "distBT20.RDS")
+```
+
+
+```{r}
+t == df_kwic
+
+
+
+
+
+
+
+
+
+
+df_kwic_test <- df_kwic
+
+df_kwic_test$weight <- 1
+
+df_kwic_test <- as.data.frame(df_kwic_test)
+
+#hier ist der Filter
+df_res1 <- df_kwic_test %>%
+  select(docname,weight)%>%
+  group_by(df_res$docname)%>%
+  reframe(
+    weight = sum(weight),
+  )
+
+
+
+df_res1$`df_res$docname`
+```
+
+```{r}
+t <- result_2014[result_2014$doc_id == "text4",]
+
+
+
+
+t.dfm <- dfm(tokens(t$text))
+
+t <- dfm_lookup(t.dfm, dictionary = dict_fixed)
+
+t
+
+
 ```
 
