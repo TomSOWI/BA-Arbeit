@@ -1,0 +1,191 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "25 5 2023"
+output: html_document
+---
+
+## Run dictionaries
+
+```{r}
+df_2019$date <- 2019
+df_2017$date <- 2017
+df_2014$date <- 2014
+
+```
+
+
+### Corpus 2019, 2017 und 2014
+```{r, warning=FALSE,echo=FALSE}
+#2019
+corp_2019 <- corpus(df_2019, text_field = "speech_content")
+
+result1 <- popdictR::run_popdict(corp_2019) 
+result2 <- popdictR::run_other_popdicts(corp_2019, include_totals = FALSE)
+result3 <- multidictR::run_multidict(corpus = corp_2019, dict = terms_kmeans_weighted, at_level = "sentences", return_value = c(
+    "count",
+    "binary",
+    "prop",
+    "count_at_level",
+    "prop_at_level"
+  ), pattern_type = c("regex"), return_result_only = F, dict_name = "kmeans_dict1", stem = F) #Stem? ; dict name?
+
+result1_2019 <- convert(result1, to = "data.frame")
+result2_2019 <- convert(result2, to = "data.frame")
+result3_2019 <- convert(result3, to = "data.frame")
+
+result_2019 <- bind_cols(result1_2019,select(result2_2019, dict_rooduijn_pauwels_2011, dict_pauwels_2017), select(result3_2019, kmeans_dict1))
+                                                                                                                  
+                                                                                                                  
+### Zusammenfassung Bundestagsreden 2019 --------------------
+
+summary_2019 <- result_2019 %>%
+  group_by(party) %>%
+  reframe(
+    sentences   = sum(n_sentences),
+    gruendl     = sum(dict_gruendl_2020) / sentences * 100,
+    pauwels     = sum(dict_pauwels_2017) / sentences * 100,
+    rooduijn    = sum(dict_rooduijn_pauwels_2011) / sentences * 100,
+    kmeans1      = sum(kmeans_dict1)/ sentences * 100
+  ) %>%
+  ungroup
+
+
+#Fraktionslose ausschließen
+summary_2019$party[summary_2019$party == "Fraktionslos"] <- NA
+summary_2019 <- na.omit(summary_2019)
+
+
+summary_2019$gruendl <- scale(summary_2019$gruendl,center = T)
+summary_2019$pauwels <- scale(summary_2019$pauwels,center = T)
+summary_2019$rooduijn <- scale(summary_2019$rooduijn,center = T)
+summary_2019$kmeans1 <- scale(summary_2019$kmeans1,center = T)
+
+
+#Kodierung DIE LINKE anpassen
+summary_2019$party[summary_2019$party == "DIE LINKE."] <- "LINKE"
+
+#saveRDS(summary_2019, file = "df_pop_2019.RDS")
+
+### Merge dictionary results with expert data ----------------------------
+df_2019_valid <- merge(summary_2019,exp_2019)                                                                                                                  
+### Correlations
+cor(x = df_2019_valid$gruendl, y = df_2019_valid$expert_rating, method = "pearson")
+cor(x = df_2019_valid$rooduijn, y = df_2019_valid$expert_rating, method = "pearson")
+cor(x = df_2019_valid$pauwels, y = df_2019_valid$expert_rating, method = "pearson")
+cor(x = df_2019_valid$kmeans, y = df_2019_valid$expert_rating, method = "pearson")                                                                                                                                                                                                                                                                  
+```                                                                                                                 
+                                                                                                                  
+
+
+
+```{r, warning=FALSE,echo=FALSE}
+#2017
+corp_2017 <- corpus(df_2017, text_field = "speech_content")
+
+result1 <- run_popdict(corp_2017) 
+result2 <- run_other_popdicts(corp_2017, include_totals = FALSE)
+
+result1_2017 <- convert(result1, to = "data.frame")
+result2_2017 <- convert(result2, to = "data.frame")
+result_2017 <- bind_cols(result1_2017,select(result2_2017, dict_rooduijn_pauwels_2011, dict_pauwels_2017))
+                         
+#2014
+
+corp_2014 <- corpus(df_2014, text_field = "speech_content")
+
+result1 <- popdictR::run_popdict(corp_2014, dict_version = "current")
+result2 <- popdictR::run_other_popdicts(corp_2014, include_totals = FALSE)
+result3 <- multidictR::run_multidict(corpus = corp_2014, dict = popdictR::gruendl_terms, at_level = "sentences", return_value = c(
+    "count",
+    "binary",
+    "prop",
+    "count_at_level",
+    "prop_at_level"
+  ), pattern_type = c("regex"), return_result_only = F, dict_name = "gruendl_2", stem = F)
+result4 <-  multidictR::run_multidict(
+      corpus = corp_2014,
+      dict = popdictR::gruendl_terms,
+      at_level = "sentences",
+      return_value = "count_at_level",
+      include_totals = TRUE,
+      return_result_only = FALSE,
+      pattern_type = "regex",
+      case_insensitive = TRUE,
+      regex_optimize = TRUE,
+      regex_make_greedy = FALSE,
+      regex_make_lazy = TRUE,
+      dict_name = "gruendl_3",
+      #custom_replacement = custom_replacement,
+      tolower = TRUE,
+      stem = FALSE,
+      remove = NULL,
+      what = "word",
+      remove_punct = TRUE,
+      remove_symbols = TRUE,
+      remove_numbers = TRUE,
+      remove_url = TRUE,
+      remove_separators = TRUE,
+      split_hyphens = FALSE,
+      include_docvars = TRUE)
+
+result1_2014 <- convert(result1, to = "data.frame")
+result2_2014 <- convert(result2, to = "data.frame")
+result3_2014 <- convert(result3, to = "data.frame")
+result4_2014 <- convert(result4, to = "data.frame")
+result_2014 <- bind_cols(result1_2014,select(result2_2014, dict_rooduijn_pauwels_2011, dict_pauwels_2017),select(result3_2014, gruendl_2), select(result4_2014, gruendl_3))
+
+t <- result_2014$gruendl_3 == result_2014$gruendl_2
+
+table(t)
+
+#dictionary(list(terms))
+```
+
+
+
+
+### Weighted Dictionay
+
+tokens per document adden und dadurch teilen und danach strukturien
+
+```{r}
+
+id2014 <- docvars(corp_2014)
+id2014$docid <- rownames(id2014)
+#tokens cleaning
+toks2014 <- tokens(corp_2014, remove_punct = T, remove_symbols = T, remove_numbers = T,remove_url = TRUE,
+      remove_separators = TRUE, include_docvars = T)
+toks2014 <- tokens_tolower(toks2014)
+toks2014 <- tokens_remove(toks2014, stopwords("german"))
+
+#dictionary implementation
+df_kwic_regex <- kwic(corp_2014, pattern = dict_regex$populismus, valuetype = "regex", window = 1) #case_insensitive = FALSE) #4752
+df_kwic_fixed <- kwic(corp_2014, pattern = dict_fixed$populismus, valuetype = "fixed", window = 1) #case_insensitive = FALSE) 
+#211
+df_kwic <- rbind(df_kwic_regex,df_kwic_fixed)
+
+#adding weights of dictionary terms
+df_res <- merge(df_kmeans_aggr,df_kwic, by = "pattern")
+df_res$docid <- as.numeric(str_sub(df_res$docname, start = 5))
+
+#aggregating weights by text
+
+df_res1 <- df_res %>%
+  select(docname,weight)%>%
+  group_by(df_res$docname)%>%
+  reframe(
+    weight = sum(weight),
+  )
+
+colnames(df_res1) <- c("doc_id","kmeans")
+
+length(unique(df_res$docname)) == length(df_res1$doc_id) #validate
+
+#merge dictionary risulöts into result dataframe
+result_2014_weight <- merge(result_2014, df_res1, by = "doc_id")
+
+result_2014_weight$validation <- ifelse(result_2014_weight$dict_gruendl_2020 != 0 & result_2014_weight$kmeans != 0, TRUE, FALSE)
+table(result_2014_weight$validation)
+```
+
