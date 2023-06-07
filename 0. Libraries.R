@@ -10,5 +10,12 @@ library(proxy)
 library(factoextra)
 library(FactoMineR)
 library(here)
+library(devtools)
+library(proxyC)
+library(tidytext)
+library(manifestoR)
+devtools::install_github("jogrue/regexhelpeR")
+devtools::install_github("jogrue/multidictR")
+devtools::install_github("jogrue/popdictR")
 
 
