@@ -1,0 +1,23 @@
+---
+title: "0.1 Ablage"
+author: "Tom Klotz"
+date: "10 5 2023"
+output: html_document
+---
+
+
+```{r}
+#Lemmitazation
+#download german ud model
+#ud_model <- udpipe_download_model("german")
+#ud_model <- udpipe_load_model(ud_model)
+
+#tokens_lemm <- function(toks){
+#  char <- as.character(toks)
+#stem <- udpipe_annotate(ud_model, char)
+#  df <- as.data.frame(stem)
+  #toks <- tokens(df$lemma)
+#}
+```
+
+

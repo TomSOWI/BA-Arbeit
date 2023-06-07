@@ -1,0 +1,113 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "29 5 2023"
+output: html_document
+---
+
+
+```{r}
+manifestoR::mp_setapikey("./Daten/manifesto_apikey.txt")
+
+election_programmes <- mp_corpus(countryname == "Germany")
+corp_mp <- corpus(election_programmes)
+#
+corp_mp <- corp_mp[corp_mp$party %in% c(41521,41320,41953,41420,41223,41113)]
+corp_mp$date <- as.numeric(str_sub(corp_mp$date, start = 1, end = 4))
+corp_mp <- corp_mp[corp_mp$date > "2010",]
+
+
+### Dictionary
+
+result1 <- popdictR::run_popdict(corp_mp)
+result2 <- popdictR::run_other_popdicts(corp_mp, include_totals = FALSE)
+result3 <- multidictR::run_multidict(corpus = corp_mp, dict = terms_kmeans_weighted, at_level = "sentences", return_value = c(
+    "count",
+    "binary",
+    "prop",
+    "count_at_level",
+    "prop_at_level"
+  ), pattern_type = c("regex"), return_result_only = F, dict_name = "kmeans_dict", stem = F) #Stem? ; dict name?
+
+result1_mp <- convert(result1, to = "data.frame")
+result2_mp <- convert(result2, to = "data.frame")
+result3_mp <- convert(result3, to = "data.frame")
+
+result_mp <- bind_cols(select(result1_mp, party, date, n_sentences, dict_gruendl_2020), select(result2_mp, dict_rooduijn_pauwels_2011, dict_pauwels_2017), select(result3_mp, kmeans_dict))
+
+
+result_mp$party[result_mp$party == 41521] <- "CDU/CSU"
+result_mp$party[result_mp$party == 41320] <- "SPD"
+result_mp$party[result_mp$party == 41953] <- "AfD"
+result_mp$party[result_mp$party == 41420] <- "FDP"
+result_mp$party[result_mp$party == 41223] <- "Grüne"
+result_mp$party[result_mp$party == 41113] <- "LINKE"
+
+table(result_mp$party)
+
+result_mp$date <- as.numeric(str_sub(result_mp$date, start = 1, end = 4))
+
+result_mp2013 <- result_mp[result_mp$date == 2013,]
+result_mp2017 <- result_mp[result_mp$date == 2017,]
+result_mp2021 <- result_mp[result_mp$date == 2021,]
+
+
+### Parteiprogramme 2013 
+
+
+summary_mp2013 <- result_mp2013 %>%
+  group_by(party) %>%
+  reframe(
+    sentences   = sum(n_sentences),
+    gruendl     = sum(dict_gruendl_2020) / sentences * 100,
+    pauwels     = sum(dict_pauwels_2017) / sentences * 100,
+    rooduijn    = sum(dict_rooduijn_pauwels_2011) / sentences * 100,
+    kmeans      = sum(kmeans_dict)/ sentences * 100
+  ) %>%
+  ungroup
+
+summary_mp2013[1:2,] <- NA #irrelevante Parteien entfernen
+#summary_mp2013 <- na.omit(summary_mp2013[1:2,])
+
+#Z-Transformation
+summary_mp2013$gruendl <- scale(summary_mp2013$gruendl,center = T)
+summary_mp2013$pauwels <- scale(summary_mp2013$pauwels,center = T)
+summary_mp2013$rooduijn <- scale(summary_mp2013$rooduijn,center = T)
+summary_mp2013$kmeans <- scale(summary_mp2013$kmeans,center = T)
+
+
+### Parteiprogramme 2017 
+
+
+summary_mp2017 <- result_mp2017 %>%
+  group_by(party) %>%
+  reframe(
+    sentences   = sum(n_sentences),
+    gruendl     = sum(dict_gruendl_2020) / sentences * 100,
+    pauwels     = sum(dict_pauwels_2017) / sentences * 100,
+    rooduijn    = sum(dict_rooduijn_pauwels_2011) / sentences * 100,
+    kmeans      = sum(kmeans_dict)/ sentences * 100
+  ) %>%
+  ungroup
+
+#summary_mp2013[1:2,] <- NA #irrelevante Parteien entfernen
+#summary_mp2013 <- na.omit(summary_mp2013[1:2,])
+
+#Z-Transformation
+summary_mp2017$gruendl <- scale(summary_mp2017$gruendl,center = T)
+summary_mp2017$pauwels <- scale(summary_mp2017$pauwels,center = T)
+summary_mp2017$rooduijn <- scale(summary_mp2017$rooduijn,center = T)
+summary_mp2017$kmeans <- scale(summary_mp2017$kmeans,center = T)
+```
+
+
+
+
+
+
+
+
+
+
+
+

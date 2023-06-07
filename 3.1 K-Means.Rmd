@@ -1,0 +1,169 @@
+---
+title: "3.1 K-Means"
+author: "Tom Klotz"
+date: "10 5 2023"
+output: html_document
+---
+ 
+
+## K-Means
+ 
+### Main dictionary
+ 
+#### BT17
+ 
+
+```{r}
+ 
+
+set.seed(123)
+ 
+truth.K = 2  # wie viele dimensionen?
+ 
+kmeansBT17 <- kmeans(distBT17, truth.K, iter.max = 10, nstart = 2)
+ 
+#fviz_nbclust(as.matrix(distBT17), kmeans, method = "wss") +    # total intra-cluster variation
+ 
+  #geom_vline(xintercept = 4, linetype = 2)+
+ 
+  #labs(subtitle = "Elbow method")
+ 
+
+```
+ 
+#### BT18
+ 
+```{r}
+ 
+
+set.seed(123)
+ 
+
+truth.K = 2  # wie viele dimensionen?
+
+kmeansBT18 <- kmeans(distBT18, truth.K, iter.max = 10, nstart = 2)
+ 
+
+ 
+
+```
+ 
+#### BT19
+ 
+```{r}
+ 
+
+set.seed(123)
+truth.K = 2  # wie viele dimensionen?
+kmeansBT19 <- kmeans(distBT19, truth.K, iter.max = 10, nstart = 2)
+ 
+
+```
+ 
+#### BT20
+
+```{r}
+set.seed(123)
+ 
+truth.K = 2  # wie viele dimensionen?
+ 
+kmeansBT20 <- kmeans(distBT20, truth.K, iter.max = 10, nstart = 2)
+ 
+```
+ 
+#### Merge
+ 
+
+```{r}
+
+dfBT17$cluster <- kmeansBT17$cluster
+dfBT18$cluster <- kmeansBT18$cluster
+dfBT19$cluster <- kmeansBT19$cluster
+dfBT20$cluster <- kmeansBT20$cluster
+ 
+df_kmeans <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20)
+ 
+df_kmeans_afd <- df_kmeans[df_kmeans$party == "AFD",] 
+ 
+prop.table(table(df_kmeans_afd$cluster))
+ 
+remove(df_kmeans_afd)
+ 
+df_kmeans_linke <- df_kmeans[df_kmeans$party == "DIE LINKE.",] 
+ 
+prop.table(table(df_kmeans_linke$cluster))
+ 
+remove(df_kmeans_linke)
+ 
+#1 is populism
+ 
+
+#2 is not populism
+ 
+
+df_kmeans$cluster[df_kmeans$cluster == 2] <- 0
+ 
+```
+ 
+
+
+### Aggregate by pattern
+ 
+
+```{r}
+ 
+df_kmeans_aggr <- aggregate(df_kmeans$cluster, by = list(df_kmeans$pattern), FUN = "mean")
+
+#Als gewichtetes Diktionär bereit
+
+
+ 
+
+saveRDS(df_kmeans_aggr, file = "dict_kmeans.RDS")
+ 
+
+```
+ 
+
+### Terms ohne matches
+ 
+```{r}
+ 
+
+terms_kmeans <- as.character(df_kmeans_aggr$Group.1)
+ 
+
+terms_nomatch <- terms[! terms %in% terms_kmeans]
+ 
+
+
+#Soll genutzt werden für die Beurteilung der fehlenden Phrasen 
+ 
+
+```
+ 
+
+### Terms nach Gewichtung selektieren
+ 
+```{r}
+ 
+102
+df_kmeans_dict <- df_kmeans_aggr[df_kmeans_aggr$x >= 0.5,]
+ 
+103
+terms_kmeans_weighted <- as.character(df_kmeans_dict$Group.1)
+ 
+104
+```
+
+```{r}
+ 
+
+tidytext::bind_tf_idf()
+?bind_tf_idf
+ 
+
+```
+ 
+
+

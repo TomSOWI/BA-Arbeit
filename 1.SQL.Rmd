@@ -23,7 +23,7 @@ con <-
     user = db_user,
     password = db_password
   )
-?dbConnect
+
 # get data tables ---------------------------------------------------------
 
 testing <- dbGetQuery(con,
@@ -85,11 +85,34 @@ BT17_20 <- dbGetQuery(con,
 #saveRDS(df_2019,file = "speeches_2019.RDS")
 
 
+# get data tables for expertvalidation ---------------------------------------------------------
 
 
+df_2019 <- dbGetQuery(con,
+                       "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
+                        FROM open_discourse.speeches AS s
+                        INNER JOIN open_discourse.factions AS f ON
+                        s.faction_id = f.id
+                        WHERE date BETWEEN '2019-01-01' AND '2019-12-31'
+                        AND NOT abbreviation = 'not found';")
 
+df_2017 <- dbGetQuery(con,
+                       "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
+                        FROM open_discourse.speeches AS s
+                        INNER JOIN open_discourse.factions AS f ON
+                        s.faction_id = f.id
+                        WHERE date BETWEEN '2017-01-01' AND '2017-12-31'
+                        AND NOT abbreviation = 'not found';")
 
+df_2014 <- dbGetQuery(con,
+                       "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
+                        FROM open_discourse.speeches AS s
+                        INNER JOIN open_discourse.factions AS f ON
+                        s.faction_id = f.id
+                        WHERE date BETWEEN '2014-01-01' AND '2014-12-31'
+                        AND NOT abbreviation = 'not found';")
 
 ```
+
 
 

@@ -36,11 +36,10 @@ is.dictionary(dict) #true
 
 df_kwic <- kwic(corp_test, pattern = dict$populismus, valuetype = "regex", window = 5)
 
-#combine pre and after
-df_kwic$context <- paste(df_kwic$pre, df$post, sep = " ")
-df_kwic$sentence <- paste(df_kwic$pre, df$post,  sep = " ")
-df_kwic$sentence <- paste(df_kwic$sentence, df$post,  sep = " ")
 
+
+#combine pre and after
+df_kwic$context <- paste(df_kwic$pre, df_kwic$post, sep = " ")
 df_kwic <- as.data.frame(df_kwic) %>% select(docname,pattern,context)
 
 
@@ -93,8 +92,6 @@ df_complete$cluster <- clustering.kmeans$cluster
 ###Anteil AfD und Linke
 
 
-
-
   
 df_afd <- df_complete[df_complete$party == "AfD",] 
 
@@ -124,42 +121,113 @@ df_aggre <- aggregate(df_complete$cluster, by = list(df_complete$pattern), FUN =
 ### Functions
 ```{r, echo=FALSE}
 #Cleaning
-corpus_cleaning <- function(df){
-  corp <- corpus(df$speech_content, docvars = data.frame(docname = testing$id, party = testing$party))
+corpus_cleaning <- function(dataframe){
+  corp <- corpus(dataframe$speech_content, docvars = data.frame(docname = dataframe$id, party = dataframe$party))
   toks <- tokens(corp, remove_punct = T, remove_symbols = T, remove_numbers = T, include_docvars = T)
   toks <- tokens_tolower(toks)
   toks <- tokens_remove(toks, stopwords("german"))
   corp <- vapply(toks, paste, FUN.VALUE = character(1), collapse = " ") %>%
   corpus()
-  df <- cbind(corp, docvars(toks)) #notwendig für die folgende Funktion
+  df <- cbind(corp, docvars(toks)) 
   rownames(df) <- df$docname
-  assign("df", df,  envir = globalenv())
-  corp <- corpus(df, text_field = "corp")
+  assign("docvars", df,  envir = globalenv()) # für corpus_to_poppulism_context_df
+  corp <- corpus(docvars, text_field = "corp")
 }
 
 #Dictionary context
+### Main terms
 terms <- popdictR::gruendl_terms
 dict <- dictionary(list(populismus = terms))
-is.dictionary(dict)
+
+
+### Total considered terms
+
+t <- popdictR::gruendl_dictionary_complete
+terms_total <- popdictR::gruendl_dictionary_complete %>% select(Word,Sub_Type,Comment,duplicate, real_duplicate,wildcard)
+
+terms_total$filter <- ifelse(terms_total$Word %in% terms, 1,0)
+table(terms_total$filter)
+
+terms_df <- terms_total[terms_total$filter ==1,]
+
+terms_fixed <- terms_df[terms_df$wildcard != "regex" & !(terms_df$Word %in% c("hausverstand(s|es)?",	
+"staatsversagen(s)?","täusch(t|en)")),]
+terms_regex <- terms_df[terms_df$wildcard == "regex"| terms_df$Word %in% c("hausverstand(s|es)?",	
+"staatsversagen(s)?","täusch(t|en)"),]
+
+dict_fixed <- dictionary(list(populismus = terms_fixed$Word))
+dict_regex <- dictionary(list(populismus = terms_regex$Word))
+
+
+
+
+terms_exp <- terms_total %>% filter(grepl('old term', Comment)) #1
+terms_exp <- na.omit(terms_total[terms_total$Comment == "appears too often? (>2000)",]) #1
+terms_exp <- terms_total %>% filter(grepl('included', Comment)) #0
+terms_exp <- terms_total %>% filter(grepl('is better', Comment)) #1
+terms_exp <- terms_total %>% filter(grepl('captures something different', Comment)) #1
+terms_exp <- na.omit(terms_total[terms_total$Comment == "check",])#0
+terms_exp <- na.omit(terms_total[terms_total$Comment == "too much abgasmanipulation",])#1
+terms_exp <- na.omit(terms_total[terms_total$Comment == "rechts?",])#1
+terms_exp <- terms_total %>% filter(grepl('not useful', Comment)) #1
+
+  
+terms_total <- terms_total %>% filter(!grepl(c("old term|appears too often? (>2000)|is better|captures something different|too much abgasmanipulation|rechts?|not useful"), Comment)) #1
+
+terms_total_duplicate <- terms_total[terms_total$duplicate == TRUE,] #no issue
+dict_total <- dictionary(list(populismus = terms_total$Word))
+
 
 corpus_to_poppulism_context_df <- function(corp){
   df_kwic <- kwic(corp, pattern = dict$populismus, valuetype = "regex", window = 5) #window 
   #combine pre and after
-  df_kwic$context <- paste(df_kwic$pre, df$post, sep = " ")
-  df_kwic$sentence <- paste(df_kwic$pre, df$post,  sep = " ")
-  df_kwic$sentence <- paste(df_kwic$sentence, df$post,  sep = " ")
+  df_kwic$context <- paste(df_kwic$pre, df_kwic$post, sep = " ")
   df_kwic <- as.data.frame(df_kwic) %>% select(docname,pattern,context)
-  df$corp <- NULL
-  df$docname  <- as.character(df$docname)
-  df_complete <- merge(df_kwic, df) #add party colum
+  docvars$corp <- NULL #aus corpus cleaning
+  docvars$docname  <- as.character(docvars$docname)
+  df_complete <- merge(df_kwic, docvars) #add party colum
 }
+
+corpus_to_poppulism_context_df_total <- function(corp){
+  df_kwic <- kwic(corp, pattern = dict_total$populismus, valuetype = "regex", window = 5) #window 
+  #combine pre and after
+  df_kwic$context <- paste(df_kwic$pre, df_kwic$post, sep = " ")
+  df_kwic <- as.data.frame(df_kwic) %>% select(docname,pattern,context)
+  docvars$corp <- NULL #aus corpus cleaning
+  docvars$docname  <- as.character(docvars$docname)
+  df_complete <- merge(df_kwic, docvars) #add party colum
+}
+
+#For Lemmetazation
+#ud_model <- udpipe_download_model("german")
+
+#tokens_lemm <- function(toks){
+#  char <- as.character(toks)
+#  stem <- udpipe_annotate(ud_model, char)
+#  df <- as.data.frame(stem)
+#  toks <- tokens(df$lemma)
+#}
+
 
 distance.matrix <- function(df){
   toks <- tokens(df$context)
-  dfm <- dfm(toks)
+  dfm <- dfm(toks) 
   dtm.matrix <- as.matrix(dfm)
-  dist.matrix <- proxy::dist(dtm.matrix, method = "euclidean")
+  dist.matrix <-proxyC::dist(dtm.matrix, method = "euclidean")
 }
+
+
+
+
+#ud_model <- udpipe_load_model(ud_model)
+
+#tokens_lemm <- function(toks){
+#  char <- as.character(toks)
+#stem <- udpipe_annotate(ud_model, char)
+#  df <- as.data.frame(stem)
+  #toks <- tokens(df$lemma)
+#}
+
 
 ```
 
@@ -174,6 +242,8 @@ df_verify == df_test #check
 
 dist_verify <- distance.matrix(df_verify)
 dist_verify == dist_test #check
+
+print(dist_verify)
 
 
 ```
@@ -191,4 +261,6 @@ dist_verify == dist_test #check
   #toks <- tokens(df$lemma)
 #}
 ```
+
+
 

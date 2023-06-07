@@ -1,0 +1,143 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "25 5 2023"
+output: html_document
+---
+
+## Expertendaten
+CHES prpearation for 2014 and 2019
+
+```{r}
+df <- read_csv("./Daten/1999-2019_CHES_dataset_means(v3).csv")
+
+#3 = Germany
+df <- df[df$country ==3,]
+
+exp <- df %>% select(c("party","year","electionyear","people_vs_elite","antielite_salience"))
+```
+
+
+### CHES 2019
+```{r}
+exp_2019 <- filter(df, year == 2019 ) %>%
+            select(c("party","people_vs_elite","antielite_salience"))
+
+#Kodierung Bündnis90 die Grünen anpassen
+exp_2019$party[exp_2019$party == "GRUNEN"] <- "Grüne"
+
+#Kodierung an Fraktion CDU/CSU anpassen
+mean_CDUCSU_salience <- (exp_2019$antielite_salience[exp_2019$party == "CDU"] + exp_2019$antielite_salience[exp_2019$party == "CSU"])/2
+
+mean_CDUCSU_people_vs_elite <- (exp_2019$people_vs_elite[exp_2019$party == "CDU"] + exp_2019$people_vs_elite[exp_2019$party == "CSU"])/2
+
+exp_2019$antielite_salience[exp_2019$party == "CDU"] <- mean_CDUCSU_salience
+exp_2019$people_vs_elite[exp_2019$party == "CDU"] <- mean_CDUCSU_people_vs_elite
+
+exp_2019$party[exp_2019$party == "CDU"] <- "CDU/CSU"
+
+#Parteien im Bundestag 2019 auswählen
+exp_2019 <- exp_2019 %>% filter(party %in% c("CDU/CSU","SPD","Grüne","LINKE","AfD","FDP"))
+
+#rowMeans Indexbildung und Z-Transformation
+exp_2019$expert_rating <- as.numeric(rowMeans(exp_2019[c("people_vs_elite","antielite_salience")],))
+exp_2019$expert_rating_z <- scale(exp_2019$expert_rating, center = T)
+
+#Remove
+exp_2019$antielite_salience <- NULL
+exp_2019$people_vs_elite <- NULL
+
+```
+
+### CSES 2017
+#### Party identifier from project manifesto database
+
+```{r}
+mp <- read_csv("./Daten/MPDataset_MPDS2022a.csv")
+
+
+table(mp$countryname)
+
+mp <- mp[mp$countryname == "Germany",]
+manifestoR::mp_setapikey("./Daten/manifesto_apikey.txt")
+
+mp <- mp %>% group_by(partyabbrev) %>%
+  reframe(party_id = party)
+
+mp
+
+#Index für CSES Datensatz
+
+# CDU/CSU 41521
+# SPD 41320
+# AfD 41953
+# FDP 41420
+# LINKE 41223
+# Grüne 41113
+
+###Apply to CSES dataframe --------------------
+
+load("~/Documents/Uni Stuttgart/BachelorarbeitPopulismus/Code/Daten/cses5.rdata")
+
+
+
+cses <- cses5 %>% 
+  rename(country = E1003) %>%
+  filter(country == 27602017) #Germany
+
+#manifesto party identifier
+table(cses$E5200_A) #CDU
+table(cses$E5200_B) #SPD
+table(cses$E5200_C) #AfD
+table(cses$E5200_D) #FDP
+table(cses$E5200_E) #Linke
+table(cses$E5200_F) #Grüne
+table(cses$E5200_G) #CSU
+
+
+
+
+cses <- cses %>%
+  select(country,starts_with("E5020")) %>% #Populism expert rating
+  rename(CDU = E5020_A, SPD = E5020_B, AfD = E5020_C, FDP = E5020_D, LINKE = E5020_E, Grüne = E5020_F, CSU = E5020_G) %>%         select(CDU, SPD, AfD, FDP, LINKE, Grüne, CSU)
+
+#Fraktion CDU/CSU
+cses$'CDU/CSU' <- (cses$CDU + cses$CSU)/2
+cses$CDU <- NULL
+cses$CSU <- NULL
+
+#Konstruktion des gewünschten Daframe-Formats
+exp_2017 <- as.data.frame(t(cses))
+exp_2017 <- exp_2017 %>% rename(expert_rating = '18515') %>% select(expert_rating)
+exp_2017$expert_rating_z <- scale(exp_2017$expert_rating, center = T)
+exp_2017$party <- rownames(exp_2017)
+```
+
+### CHES 2014
+
+```{r}
+
+exp_2014 <- filter(df, year == 2014 ) %>%
+            select(c("party","antielite_salience"))
+
+#Kodierung Bündnis90 die Grünen anpassen
+exp_2014$party[exp_2014$party == "Grunen"] <- "Grüne"
+
+#Kodierung an Fraktion CDU/CSU anpassen
+mean_CDUCSU <- (exp_2014$antielite_salience[exp_2014$party == "CDU"] + exp_2014$antielite_salience[exp_2014$party == "CSU"])/2
+
+exp_2014$antielite_salience[exp_2014$party == "CDU"] <- mean_CDUCSU
+exp_2014$party[exp_2014$party == "CDU"] <- "CDU/CSU" 
+
+
+#Parteien im Bundestag 2014 auswählen
+exp_2014 <- exp_2014 %>% filter(party %in% c("CDU/CSU","SPD","Grüne","LINKE"))
+
+#Z-Transformation
+exp_2014$expert_rating <- as.numeric(exp_2014$antielite_salience)
+exp_2014$expert_rating_z <- scale(exp_2014$expert_rating, center = T)
+
+#Remove
+exp_2014$antielite_salience <- NULL
+
+```
