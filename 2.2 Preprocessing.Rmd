@@ -1,39 +1,44 @@
 ---
-title: "Untitled"
+title: "Prep"
 author: "Tom Klotz"
-date: "4 5 2023"
+date: "3 5 2023"
 output: html_document
 ---
-
+ 
 ### Preprocessing
+ 
+### Main dict
+
 ```{r}
+
 #17
 corpBT17 <- tokens_cleaning(BT17)
+corpBT17 <- corpus_cleaning(BT17)
 dfBT17 <- corpus_to_poppulism_context_df(corpBT17)
 distBT17 <- distance.matrix(dfBT17)
 saveRDS(distBT17, file = "distBT17.RDS")
+
 #18
 corpBT18 <- tokens_cleaning(BT18)
+corpBT18 <- corpus_cleaning(BT18)
 dfBT18 <- corpus_to_poppulism_context_df(corpBT18)
 distBT18 <- distance.matrix(dfBT18)
 saveRDS(distBT18, file = "distBT18.RDS")
+
 #19
 corpBT19 <- tokens_cleaning(BT19)
+corpBT19 <- corpus_cleaning(BT19)
 dfBT19 <- corpus_to_poppulism_context_df(corpBT19)
 distBT19 <- distance.matrix(dfBT19)
 saveRDS(distBT19, file = "distBT19.RDS")
 #20
 corpBT20 <- tokens_cleaning(BT20)
+corpBT20 <- corpus_cleaning(BT20)
 dfBT20 <- corpus_to_poppulism_context_df(corpBT20)
 distBT20 <- distance.matrix(dfBT20)
 saveRDS(distBT20, file = "distBT20.RDS")
 
-```
 
-
-### Ecaluation of Preprocessing
-
-```{r}
 
 ```
 
