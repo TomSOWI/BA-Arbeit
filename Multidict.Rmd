@@ -29,30 +29,40 @@ test <- c("Hallo","Hello","Danke")
 ### Corpus
 
 #### Testing
-
+Anwendung anderer Diktionäre funktioniert...aber esgibt keine Möglichkeit eine Gewichtung vorzumehmen
 ```{r}
 corp_test <- corpus(testing, text_field = "speech_content")
 
 
 
 
-result <- multidictR::run_multidict(corpus = corp_test, dict = terms, at_level = "sentences", return_value = c(
+result <- multidictR::run_multidict(corpus = corp_test, dict = terms_kmeans, at_level = "sentences", return_value = c(
     "count",
     "binary",
     "prop",
     "count_at_level",
     "prop_at_level"
-  ), pattern_type = c("regex"), return_result_only = TRUE, dict_name = "gruendl")
+  ), pattern_type = c("regex"), return_result_only = F, dict_name = "gruendl", stem = T)
+
+result2 <- convert(result, to = "data.frame")
 
 
 
 ```
 
-#### Deployment
-
 ```{r}
-corp_20 <- corpus(BT20, text_field = "speech_content")
-multidictR::run_multidict(corpus = corp_20, dict = terms)
+result <- popdictR::run_popdict(corpus = corp_test)
+result1 <- convert(result, to = "data.frame")
+```
 
+### Tidytext experiment
+```{r}
+library(remotes)
+library(textdata)
+library(tidydata)
+install.packages("tidydata")
+install_github("juliasilge/tidytext")
+
+textdata::lexicon_afinn()
 ```
 

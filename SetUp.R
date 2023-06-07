@@ -14,4 +14,4 @@ use_git_config(user.name = "TomSOWI", user.email = "tomklotz@gmx.net")
 
 ### Resetting to 0lder version ###
 
-git reset --hard 1c05dfb87e6208710ac4f67d3dddfa4f08822ded (SHA)
+#git reset --hard 1c05dfb87e6208710ac4f67d3dddfa4f08822ded (SHA)
