@@ -10,34 +10,31 @@ output: html_document
 ### Main dict
 
 ```{r}
+#gruendl terms
+gruendl_compound <- gruendl_patterns_to_compound()
 
 #17
-corpBT17 <- tokens_cleaning(BT17)
-corpBT17 <- corpus_cleaning(BT17)
-dfBT17 <- corpus_to_poppulism_context_df(corpBT17)
-distBT17 <- distance.matrix(dfBT17)
-saveRDS(distBT17, file = "distBT17.RDS")
+corpBT17 <- corpus_preparation(BT17)
+dfBT17 <- corpus_to_poppulism_context_df(corpBT17, terms = gruendl_compound)
+distBT17_euclidean <- distance.matrix(dfBT17, method = "euclidean")
+saveRDS(distBT17_euclidean, file = "distBT17_euclidean.RDS")
 
 #18
-corpBT18 <- tokens_cleaning(BT18)
-corpBT18 <- corpus_cleaning(BT18)
-dfBT18 <- corpus_to_poppulism_context_df(corpBT18)
-distBT18 <- distance.matrix(dfBT18)
-saveRDS(distBT18, file = "distBT18.RDS")
+corpBT18 <- corpus_preparation(BT18)
+dfBT18 <- corpus_to_poppulism_context_df(corpBT18, terms = gruendl_compound)
+distBT18_euclidean <- distance.matrix(dfBT18, method = "euclidean")
+saveRDS(distBT18_euclidean, file = "distBT18_euclidean.RDS")
 
 #19
-corpBT19 <- tokens_cleaning(BT19)
-corpBT19 <- corpus_cleaning(BT19)
-dfBT19 <- corpus_to_poppulism_context_df(corpBT19)
-distBT19 <- distance.matrix(dfBT19)
-saveRDS(distBT19, file = "distBT19.RDS")
+corpBT19 <- corpus_preparation(BT19)
+dfBT19 <- corpus_to_poppulism_context_df(corpBT19, terms = gruendl_compound)
+distBT19_euclidean <- distance.matrix(dfBT19, method = "euclidean")
+saveRDS(distBT19_euclidean, file = "distBT19_euclidean.RDS")
 #20
-corpBT20 <- tokens_cleaning(BT20)
-corpBT20 <- corpus_cleaning(BT20)
-dfBT20 <- corpus_to_poppulism_context_df(corpBT20)
-distBT20 <- distance.matrix(dfBT20)
-saveRDS(distBT20, file = "distBT20.RDS")
-
+corpBT20 <- corpus_preparation(BT20)
+dfBT20 <- corpus_to_poppulism_context_df(corpBT20, terms = gruendl_compound)
+distBT20_euclidean <- distance.matrix(dfBT20, method = "euclidean")
+saveRDS(distBT20_euclidean, file = "distBT17_euclidean.RDS")
 
 
 ```
