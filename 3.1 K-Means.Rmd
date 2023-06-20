@@ -12,128 +12,121 @@ output: html_document
  
 #### BT17
  
-
 ```{r}
- 
-
 set.seed(123)
- 
-truth.K = 2  # wie viele dimensionen?
- 
-kmeansBT17 <- kmeans(distBT17, truth.K, iter.max = 10, nstart = 2)
- 
-#fviz_nbclust(as.matrix(distBT17), kmeans, method = "wss") +    # total intra-cluster variation
- 
-  #geom_vline(xintercept = 4, linetype = 2)+
- 
-  #labs(subtitle = "Elbow method")
- 
+kmeansBT17 <- kmeans(distBT17_euclidean, k = 2, iter.max = 10, nstart = 2)
+# Result
+kmeansBT17.image <-fviz_cluster(object = kmeansBT17, data = distBT17_euclidean,ellipse.type = "norm",
+             geom = "point")
 
+saveRDS(kmeansBT17, file = "kmeansBT17.RDS")
+saveRDS(kmeansBT17.image, file = "kmeansBT17.image.RDS")
+
+# Label asignment
+dfBT17$cluster <- kmeansBT17$cluster
+dfKmeansLinke <- dfBT17[dfBT17$party == "DIE LINKE.",] 
+prop.table(table(dfKmeansLinke$cluster))
+dfBT17$cluster[dfBT17$cluster == 2] <- 0 # cluster one is populism
 ```
  
 #### BT18
  
 ```{r}
- 
-
 set.seed(123)
- 
+kmeansBT18 <- kmeans(distBT18_euclidean, k = 2, iter.max = 10, nstart = 2)
+# Result
+kmeansBT18.image <-fviz_cluster(object = kmeansBT18, data = distBT18_euclidean,ellipse.type = "norm",
+             geom = "point")
 
-truth.K = 2  # wie viele dimensionen?
+saveRDS(kmeansBT18, file = "kmeansBT18.RDS")
+saveRDS(kmeansBT18.image, file = "kmeansBT18.image.RDS")
 
-kmeansBT18 <- kmeans(distBT18, truth.K, iter.max = 10, nstart = 2)
- 
-
- 
-
+# Label asignment
+dfBT18$cluster <- kmeansBT18$cluster
+dfKmeansLinke <- dfBT18[dfBT18$party == "DIE LINKE.",] 
+prop.table(table(dfKmeansLinke$cluster))
+dfBT18$cluster <- dfBT18$cluster - 1 # cluster two is populisms
 ```
  
 #### BT19
  
 ```{r}
- 
-
 set.seed(123)
-truth.K = 2  # wie viele dimensionen?
-kmeansBT19 <- kmeans(distBT19, truth.K, iter.max = 10, nstart = 2)
- 
+kmeansBT19 <- kmeans(distBT19_euclidean, k = 2, iter.max = 10, nstart = 2)
+# Result
+kmeansBT19.image <-fviz_cluster(object = kmeansBT19, data = distBT19_euclidean,ellipse.type = "norm",
+             geom = "point")
 
+saveRDS(kmeansBT19, file = "kmeansBT19.RDS")
+saveRDS(kmeansBT19.image, file = "kmeansBT19.image.RDS")
+
+#Label asignment
+dfBT19$cluster <- kmeansBT19$cluster
+dfKmeansLinke <- dfBT19[dfBT19$party == "DIE LINKE.",] 
+prop.table(table(dfKmeansLinke$cluster))
+dfKmeansAfD <- dfBT19[dfBT19$party == "AfD",] 
+prop.table(table(dfKmeansAfD$cluster))
+dfBT19$cluster[dfBT19$cluster == 2] <- 0 # cluster one is populism
 ```
  
 #### BT20
 
 ```{r}
 set.seed(123)
+kmeansBT20 <- kmeans(distBT20_euclidean, k = 2, iter.max = 10, nstart = 2)
+# Result
+kmeansBT20.image <-fviz_cluster(object = kmeansBT20, data = distBT20_euclidean,ellipse.type = "norm",
+             geom = "point")
+
+saveRDS(kmeansBT20, file = "kmeansBT20.RDS")
+saveRDS(kmeansBT20.image, file = "kmeansBT20.image.RDS")
+
+# Label asignment
+dfBT20$cluster <- kmeansBT20$cluster
+dfKmeansLinke <- dfBT20[dfBT20$party == "DIE LINKE.",] 
+prop.table(table(dfKmeansLinke$cluster))
+dfKmeansAfD <- dfBT20[dfBT20$party == "AfD",] 
+prop.table(table(dfKmeansAfD$cluster))
+dfBT20$cluster <- dfBT20$cluster - 1 # cluster two is populisms
+```
  
-truth.K = 2  # wie viele dimensionen?
  
-kmeansBT20 <- kmeans(distBT20, truth.K, iter.max = 10, nstart = 2)
+
+#### Merge
+ 
+```{r}
+dfKmeans <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20) 
+dfKmeans <- aggregate(dfKmeans$cluster, by = list(dfKmeans$pattern), FUN = "mean")
+colnames(dfKmeans) <- c("pattern","weight")
+dfKmeans$pattern <- make_patterns_compound(dfKmeans$pattern) #for merging later
+
+saveRDS(dfKmeans, file = "dfKmeans.RDS")
+
  
 ```
  
+ 
+
 #### Merge
  
 
 ```{r}
+dfKmeans <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20) 
+dfKmeans <- aggregate(dfKmeans$cluster, by = list(dfKmeans$pattern), FUN = "mean")
+colnames(dfKmeans) <- c("pattern","weight")
+dfKmeans$pattern <- make_patterns_compound(dfKmeans$pattern) #for merging later
 
-dfBT17$cluster <- kmeansBT17$cluster
-dfBT18$cluster <- kmeansBT18$cluster
-dfBT19$cluster <- kmeansBT19$cluster
-dfBT20$cluster <- kmeansBT20$cluster
- 
-df_kmeans <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20)
- 
-df_kmeans_afd <- df_kmeans[df_kmeans$party == "AFD",] 
- 
-prop.table(table(df_kmeans_afd$cluster))
- 
-remove(df_kmeans_afd)
- 
-df_kmeans_linke <- df_kmeans[df_kmeans$party == "DIE LINKE.",] 
- 
-prop.table(table(df_kmeans_linke$cluster))
- 
-remove(df_kmeans_linke)
- 
-#1 is populism
- 
-
-#2 is not populism
- 
-
-df_kmeans$cluster[df_kmeans$cluster == 2] <- 0
  
 ```
  
-
-
-### Aggregate by pattern
- 
-
-```{r}
- 
-df_kmeans_aggr <- aggregate(df_kmeans$cluster, by = list(df_kmeans$pattern), FUN = "mean")
-
-
-colnames(df_kmeans_aggr) <- c("pattern","weight")
-
- 
-
-#saveRDS(df_kmeans_aggr, file = "dict_kmeans.RDS")
- 
-
-```
  
 
 ### Terms ohne matches
  
 ```{r}
  
-
-terms_kmeans <- as.character(df_kmeans_aggr$Group.1)
- 
-
-terms_nomatch <- terms[! terms %in% terms_kmeans]
+termsKmeans <- as.character(dfKmeans$pattern)
+termsNomatch <- terms[!terms %in% termsKmeans]
  
 
 
@@ -143,27 +136,143 @@ terms_nomatch <- terms[! terms %in% terms_kmeans]
 ```
  
 
-### Terms nach Gewichtung selektieren
- 
-```{r}
- 
 
-df_kmeans_dict <- df_kmeans_aggr[df_kmeans_aggr$x >= 0.5,]
- 
-103
-terms_kmeans_weighted <- as.character(df_kmeans_dict$Group.1)
- 
+#############################################################
+#K-Means with true k
+#############################################################
+
+
+```{r}
+#BT17
+
+kmeansBT17TrueK <- fviz_nbclust(as.matrix(distBT17_euclidean), kmeans, method = "wss") +    # total intra-cluster variation
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+
+truth.K = 4 
+
+kmeansBT17K <- kmeans(distBT17_euclidean, truth.K, iter.max = 10, nstart = 2)
+###Result
+kmeansBT17K.image <-fviz_cluster(object = kmeansBT17K, data = distBT17_euclidean,ellipse.type = "norm",
+             geom = "point")
+
+save(kmeansBT17K, file = "dfKmeansBT17K.RDS")
+save(kmeansBT17K.image, file = "kmeansBT17K.image.RDS")
+
+# Cluster label asignment
+dfBT17$cluster.kmeans.trueK <- kmeansBT17K$cluster
+dfKmeansKLinke <- dfBT17[dfBT17$party == "DIE LINKE.",] 
+prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
+
+dfBT17$cluster.kmeans.trueK[dfBT17$cluster.kmeans.trueK == 1] <- 0
+dfBT17$cluster.kmeans.trueK[dfBT17$cluster.kmeans.trueK == 2] <- 1
+dfBT17$cluster.kmeans.trueK[dfBT17$cluster.kmeans.trueK == 3] <- 0
+dfBT17$cluster.kmeans.trueK[dfBT17$cluster.kmeans.trueK == 4] <- 1
+```
+
+
+```{r}
+#BT18
+
+kmeansBT18TrueK <- fviz_nbclust(as.matrix(distBT18_euclidean), kmeans, method = "wss") +    # total intra-cluster variation
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+
+truth.K = 4 
+
+kmeansBT18K <- kmeans(distBT17_euclidean, truth.K, iter.max = 10, nstart = 2)
+###Result
+kmeansBT18K.image <-fviz_cluster(object = kmeansBT18K, data = distBT18_euclidean,ellipse.type = "norm",
+             geom = "point")
+
+save(kmeansBT18K, file = "dfKmeansBT18K.RDS")
+save(kmeansBT18K.image, file = "kmeansBT18K.image.RDS")
+
+# Cluster label asignment
+dfBT18$cluster.kmeans.trueK <- kmeansBT18K$cluster
+dfKmeansKLinke <- dfBT18[dfBT18$party == "DIE LINKE.",] 
+prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
+
+
+dfBT18$cluster.kmeans.trueK[dfBT18$cluster.kmeans.trueK == 2] <- 0
+dfBT18$cluster.kmeans.trueK[dfBT18$cluster.kmeans.trueK == 3] <- 0
+dfBT18$cluster.kmeans.trueK[dfBT18$cluster.kmeans.trueK == 4] <- 1
+```
+
+
+```{r}
+#BT19
+
+kmeansBT19TrueK <- fviz_nbclust(as.matrix(distBT19_euclidean), kmeans, method = "wss") +    # total intra-cluster variation
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+
+truth.K = 4 
+
+kmeansBT19K <- kmeans(distBT19_euclidean, truth.K, iter.max = 10, nstart = 2)
+###Result
+kmeansBT19K.image <-fviz_cluster(object = kmeansBT19K, data = distBT19_euclidean,ellipse.type = "norm",
+             geom = "point")
+
+save(kmeansBT19K, file = "dfKmeansBT19K.RDS")
+save(kmeansBT19K.image, file = "kmeansBT19K.image.RDS")
+
+# Cluster label asignment
+dfBT19$cluster.kmeans.trueK <- kmeansBT19K$cluster
+dfKmeansKLinke <- dfBT19[dfBT19$party == "DIE LINKE.",] 
+prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
+dfKmeansKAfD <- dfBT19[dfBT19$party == "AfD",] 
+prop.table(table(dfKmeansKAfD$cluster.kmeans.trueK))
+
+dfBT19$cluster.kmeans.trueK[dfBT19$cluster.kmeans.trueK == 1] <- 0
+dfBT19$cluster.kmeans.trueK[dfBT19$cluster.kmeans.trueK == 2] <- 0
+dfBT19$cluster.kmeans.trueK[dfBT19$cluster.kmeans.trueK == 3] <- 0
+dfBT19$cluster.kmeans.trueK[dfBT19$cluster.kmeans.trueK == 4] <- 1
 
 ```
 
-```{r}
- 
 
-tidytext::bind_tf_idf()
-?bind_tf_idf
- 
+```{r}
+# BT20
+
+kmeansBT20TrueK <- fviz_nbclust(as.matrix(distBT20_euclidean), kmeans, method = "wss") +    # total intra-cluster variation
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+
+truth.K = 4 
+
+kmeansBT20K <- kmeans(distBT20_euclidean, truth.K, iter.max = 10, nstart = 2)
+# Result
+
+kmeansBT20K.image <-fviz_cluster(object = kmeansBT20K, data = distBT20_euclidean,ellipse.type = "norm",
+             geom = "point")
+save(kmeansBT20K, file = "dfKmeansBT20K.RDS")
+save(kmeansBT20K.image, file = "kmeansBT20K.image.RDS")
+
+
+# Cluster label asignment
+dfBT20$cluster.kmeans.trueK <- kmeansBT20K$cluster
+dfKmeansKLinke <- dfBT20[dfBT20$party == "DIE LINKE.",] 
+prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
+dfKmeansKAfD <- dfBT20[dfBT20$party == "AfD",] 
+prop.table(table(dfKmeansKAfD$cluster.kmeans.trueK))
+
+dfBT20$cluster.kmeans.trueK[dfBT20$cluster.kmeans.trueK == 1] <- 0
+dfBT20$cluster.kmeans.trueK[dfBT20$cluster.kmeans.trueK == 2] <- 0
+dfBT20$cluster.kmeans.trueK[dfBT20$cluster.kmeans.trueK == 3] <- 1
+dfBT20$cluster.kmeans.trueK[dfBT20$cluster.kmeans.trueK == 4] <- 0
 
 ```
- 
+
+
+### Merge
+```{r}
+dfKmeansK <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20) 
+dfKmeansK <- aggregate(dfKmeansK$cluster, by = list(dfKmeansK$pattern), FUN = "mean")
+colnames(dfKmeansK) <- c("pattern","weight")
+dfKmeansK$pattern <- make_patterns_compound(dfKmeansK$pattern) #for merging later
+
+saveRDS(dfKmeansK, file = "dfKmeansK.RDS")
+```
 
 

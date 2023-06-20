@@ -1,3 +1,5 @@
+
+
 gruendl_patterns_to_compound <- function(){
   terms <- popdictR::gruendl_terms
   terms_optimized <- regexhelpeR::optimize_regex_patterns(terms)
@@ -6,3 +8,12 @@ gruendl_patterns_to_compound <- function(){
   terms_underscore <- stringi::stri_replace_all_fixed(terms_underscore, "(.*?_)?", "[^_]*_")
   terms_underscore <- stringi::stri_replace_all_fixed(terms_underscore, "(_.*?)?", "_[^_]")
 }
+
+make_patterns_compound <- function(pattern){
+  terms_optimized <- regexhelpeR::optimize_regex_patterns(pattern)
+  terms_lazy <- regexhelpeR::make_all_regex_lazy(terms_optimized)
+  terms_underscore <- stringi::stri_replace_all_fixed(terms_lazy," ", "_")
+  terms_underscore <- stringi::stri_replace_all_fixed(terms_underscore, "(.*?_)?", "[^_]*_")
+  terms_underscore <- stringi::stri_replace_all_fixed(terms_underscore, "(_.*?)?", "_[^_]")
+}
+

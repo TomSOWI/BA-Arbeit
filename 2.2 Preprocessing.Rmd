@@ -13,11 +13,7 @@ output: html_document
 #gruendl terms
 gruendl_compound <- gruendl_patterns_to_compound()
 
-#17
-corpBT17 <- corpus_preparation(BT17)
-dfBT17 <- corpus_to_poppulism_context_df(corpBT17, terms = gruendl_compound)
-distBT17_euclidean <- distance.matrix(dfBT17, method = "euclidean")
-saveRDS(distBT17_euclidean, file = "distBT17_euclidean.RDS")
+
 
 #18
 corpBT18 <- corpus_preparation(BT18)
@@ -34,8 +30,25 @@ saveRDS(distBT19_euclidean, file = "distBT19_euclidean.RDS")
 corpBT20 <- corpus_preparation(BT20)
 dfBT20 <- corpus_to_poppulism_context_df(corpBT20, terms = gruendl_compound)
 distBT20_euclidean <- distance.matrix(dfBT20, method = "euclidean")
-saveRDS(distBT20_euclidean, file = "distBT17_euclidean.RDS")
+saveRDS(distBT20_euclidean, file = "distBT20_euclidean.RDS")
 
+#17
+corpBT17 <- corpus_preparation(BT17)
+dfBT17 <- corpus_to_poppulism_context_df(corpBT17, terms = gruendl_compound)
+distBT17_euclidean <- distance.matrix(dfBT17, method = "euclidean")
+saveRDS(distBT17_euclidean, file = "distBT17_euclidean.RDS")
+
+
+####jaccard
+distBT20_jaccard <- distance_matrix(dfBT20, method = "jaccard")
+saveRDS(distBT20_jaccard, file = "distBT20_jaccard.RDS")
+distBT19_jaccard <- distance_matrix(dfBT19, method = "jaccard")
+saveRDS(distBT19_jaccard, file = "distBT19_jaccard.RDS")
+distBT18_jaccard <- distance_matrix(dfBT18, method = "jaccard")
+saveRDS(distBT18_jaccard, file = "distBT18_jaccard.RDS")
+distBT17_jaccard <- distance_matrix(dfBT17, method = "jaccard")
+saveRDS(distBT17_jaccard, file = "distBT17_jaccard.RDS")
+```
 
 ```
 

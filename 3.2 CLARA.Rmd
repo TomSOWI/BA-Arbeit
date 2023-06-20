@@ -1,0 +1,246 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "15 6 2023"
+output: html_document
+---
+
+
+#############################################################
+# CLARA
+#############################################################
+
+##############################
+## Two Dimensions
+##############################
+
+
+
+
+```{r}
+# BT17
+set.seed(123)
+claraBT17Jaccard <- clara(distBT17_jaccard, k = 2, samples = 50, pamLike = TRUE)
+# Result
+claraBT17Jaccard.image <-fviz_cluster(object = claraBT17Jaccard, data = distBT17_jaccard, ellipse.type = "norm",
+             geom = "point")
+
+saveRDS(claraBT17Jaccard, file = "claraBT17Jaccard.RDS")
+saveRDS(claraBT17Jaccard.image, file = "claraBT17Jaccard.image.RDS")
+
+# Cluster label asignment
+dfBT17$cluster.clara.jaccard <- claraBT17Jaccard$clustering
+dfClaraLinke <- dfBT17[dfBT17$party == "DIE LINKE.",] 
+prop.table(table(dfClaraLinke$cluster))
+dfBT17$cluster.clara.jaccard  <- dfBT17$cluster.clara.jaccard  - 1 # cluster two is populism
+```
+
+
+```{r}
+# BT18
+set.seed(123)
+claraBT18Jaccard <- clara(distBT18_jaccard, k = 2, samples = 50, pamLike = TRUE)
+
+claraBT18Jaccard.image <-fviz_cluster(object = claraBT18Jaccard, data = distBT18_jaccard, ellipse.type = "norm",
+             geom = "point")
+
+saveRDS(claraBT18Jaccard, file = "claraBT18Jaccard.RDS")
+saveRDS(claraBT18Jaccard.image, file = "claraBT18Jaccard.image.RDS")
+
+# Cluster label asignment
+dfBT18$cluster.clara.jaccard <- claraBT18Jaccard$clustering
+dfClaraLinke <- dfBT18[dfBT18$party == "DIE LINKE.",] 
+prop.table(table(dfClaraLinke$cluster)) # 47 vs 57
+dfBT18$cluster.clara.jaccard  <- dfBT18$cluster.clara.jaccard  - 1 # cluster two is populism
+```
+
+
+```{r}
+# BT19
+set.seed(123)
+claraBT19Jaccard <- clara(distBT19_jaccard, k = 2, samples = 50, pamLike = TRUE)
+# Result
+claraBT19Jaccrad.image <-fviz_cluster(object = claraBT19Jaccard, data = distBT19_jaccard, ellipse.type = "norm",
+             geom = "point")
+
+saveRDS(claraBT19Jaccard, file = "claraBT19Jaccard.RDS")
+saveRDS(claraBT19Jaccard.image, file = "claraBT19Jaccard.image.RDS")
+
+# Cluster label asignment
+dfBT19$cluster.clara.jaccard <- claraBT19Jaccard$clustering
+dfClaraLinke <- dfBT19[dfBT19$party == "DIE LINKE.",] 
+prop.table(table(dfClaraLinke$cluster))
+dfClaraAfD <- dfBT19[dfBT19$party == "AfD",] 
+prop.table(table(dfClaraAfD$cluster))
+dfBT19$cluster.clara.jaccard[dfBT19$cluster.clara.jaccard == 2] <- 0 # cluster one is populism
+```
+
+
+```{r}
+# BT20
+set.seed(123)
+claraBT20Jaccard <- clara(distBT20_jaccard, k = 2, samples = 50, pamLike = TRUE)
+#Result
+claraBT20Jaccard.image <-fviz_cluster(object = claraBT20Jaccard, data = distBT20_jaccard, ellipse.type = "norm",
+             geom = "point")
+
+saveRDS(claraBT20Jaccard, file = "claraBT20Jaccard.RDS")
+saveRDS(claraBT20Jaccard.image, file = "claraBT20Jaccard.image.RDS")
+
+# Cluster label asignment
+dfBT20$cluster.clara.jaccard <- claraBT20Jaccard$clustering
+dfClaraLinke <- dfBT20[dfBT20$party == "DIE LINKE.",] 
+prop.table(table(dfClaraLinke$cluster))
+dfClaraAfD <- dfBT20[dfBT20$party == "AfD",] 
+prop.table(table(dfClaraAfD$cluster)) 
+dfBT20$cluster.clara.jaccard[dfBT20$cluster.clara.jaccard == 2] <- 0 # cluster one is populism
+```
+
+### Merge
+
+```{r}
+
+dfClara <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20)
+dfClara <- aggregate(dfClara$cluster, by = list(dfClara$pattern), FUN = "mean")
+colnames(dfClara) <- c("pattern","weight")
+dfClara$pattern <- make_patterns_compound(dfClara$pattern) #for merging lat
+saveRDS(dfClara, file = "dfClaraJaccard.RDS")
+
+```
+
+
+
+
+
+##############################
+## True Dimensions
+##############################
+
+
+```{r}
+# BT20
+set.seed(123)
+claraBT20TrueK <- fviz_nbclust(as.matrix(distBT20_jaccard), clara, method = "wss") +    
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+
+
+claraBT20KJaccard <- clara(distBT20_jaccard, truth.K, samples = 50, pamLike = TRUE)
+
+claraBT20KJaccard.image <-fviz_cluster(object = claraBT20KJaccard, data = distBT20_jaccard,ellipse.type = "norm",
+             geom = "point")
+
+saveRDS(claraBT20KJaccard, file = "claraBT20KJaccard.RDS")
+saveRDS(claraBT20KJaccard.image, file = "claraBT20KJaccard.image.RDS")
+
+# Cluster label asignment
+dfBT20$cluster.clara.truek.jaccard <- claraBT20KJaccard$clustering
+dfClaraKLinke <- dfBT20[dfBT20$party == "DIE LINKE.",] 
+prop.table(table(dfClaraKLinke$cluster))
+dfClaraKAfD <- dfBT20[dfBT20$party == "AfD",] 
+prop.table(table(dfClaraKAfD$cluster)) 
+
+dfBT20$cluster.clara.truek.jaccard[dfBT20$cluster.clara.truek.jaccard == 2] <- 1
+dfBT20$cluster.clara.truek.jaccard[dfBT20$cluster.clara.truek.jaccard == 3] <- 1
+dfBT20$cluster.clara.truek.jaccard[dfBT20$cluster.clara.truek.jaccard == 1] <- 0
+dfBT20$cluster.clara.truek.jaccard[dfBT20$cluster.clara.truek.jaccard == 4] <- 0
+```
+
+```{r}
+# BT19
+set.seed(123)
+claraBT19TrueK <- fviz_nbclust(as.matrix(distBT19), clara, method = "wss") +    
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+
+truth.K = 4 
+
+claraBT19KJaccard <- clara(distBT19_jaccard, truth.K, samples = 50, pamLike = TRUE)
+
+claraBT19KJaccard.image <-fviz_cluster(object = claraBT19KJaccard, data = distBT19_jaccard,ellipse.type = "norm",
+             geom = "point")
+
+saveRDS(claraBT19KJaccard, file = "claraBT19KJaccard.RDS")
+saveRDS(claraBT19KJaccard.image, file = "claraBT19KJaccard.image.RDS")
+
+# Cluster label asignment
+dfBT19$cluster.clara.truek.jaccard <- claraBT19KJaccard$clustering
+dfClaraKLinke <- dfBT19[dfBT19$party == "DIE LINKE.",] 
+prop.table(table(dfClaraKLinke$cluster))
+dfClaraKAfD <- dfBT19[dfBT19$party == "AfD",] 
+prop.table(table(dfClaraKAfD$cluster))
+
+dfBT19$cluster.clara.truek.jaccard[dfBT19$cluster.clara.truek.jaccard == 2] <- 0
+dfBT19$cluster.clara.truek.jaccard[dfBT19$cluster.clara.truek.jaccard == 3] <- 0
+dfBT19$cluster.clara.truek.jaccard[dfBT19$cluster.clara.truek.jaccard == 4] <- 0
+```
+
+```{r}
+# BT18
+set.seed(123)
+claraBT18TrueK <- fviz_nbclust(as.matrix(distBT18), clara, method = "wss") +    
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+
+truth.K = 4 
+
+claraBT18KJaccard <- clara(distBT18_jaccard, truth.K, samples = 50, pamLike = TRUE)
+
+claraBT18KJaccard.image <-fviz_cluster(object = claraBT18KJaccard, data = distBT18_jaccard,ellipse.type = "norm",
+             geom = "point")
+
+saveRDS(claraBT18KJaccard, file = "claraBT18KJaccard.RDS")
+saveRDS(claraBT18KJaccard.image, file = "claraBT18KJaccard.image.RDS")
+
+# Cluster label asignment
+dfBT18$cluster.clara.truek.jaccard <- claraBT18KJaccard$clustering
+dfClaraKLinke <- dfBT18[dfBT18$party == "DIE LINKE.",] 
+prop.table(table(dfClaraKLinke$cluster))
+
+dfBT18$cluster.clara.truek.jaccard[dfBT18$cluster.clara.truek.jaccard == 2] <- 1
+dfBT18$cluster.clara.truek.jaccard[dfBT18$cluster.clara.truek.jaccard == 3] <- 0
+dfBT18$cluster.clara.truek.jaccard[dfBT18$cluster.clara.truek.jaccard == 4] <- 0
+
+
+
+```
+
+```{r}
+# BT 17
+set.seed(123)
+claraBT17TrueK <- fviz_nbclust(as.matrix(distBT17), clara, method = "wss") +    
+  geom_vline(xintercept = 4, linetype = 2)+
+  labs(subtitle = "Elbow method")
+
+truth.K = 4 
+
+claraBT17KJaccard <- clara(distBT17_jaccard, samples = 50, pamLike = TRUE)
+
+claraBT17KJaccard.image <-fviz_cluster(object = claraBT17KJaccard, data = distBT17_jaccard,ellipse.type = "norm",
+             geom = "point")
+
+saveRDS(claraBT17KJaccard, file = "claraBT17KJaccard.RDS")
+saveRDS(claraBT17KJaccard.image, file = "claraBT17KJaccard.image.RDS")
+
+# Cluster label asignment
+dfBT17$cluster.clara.truek.jaccard <- claraBT17KJaccard$clustering
+dfClaraKLinke <- dfBT17[dfBT17$party == "DIE LINKE.",] 
+prop.table(table(dfClaraKLinke$cluster))
+
+dfBT17$cluster.clara.truek.jaccard[dfBT17$cluster.clara.truek.jaccard == 1] <- 0
+dfBT17$cluster.clara.truek.jaccard[dfBT17$cluster.clara.truek.jaccard == 2] <- 1
+dfBT17$cluster.clara.truek.jaccard[dfBT17$cluster.clara.truek.jaccard == 3] <- 0
+dfBT17$cluster.clara.truek.jaccard[dfBT17$cluster.clara.truek.jaccard == 4] <- 0
+
+```
+
+### Merge
+
+```{r}
+dfClaraK <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20)
+dfClaraK <- aggregate(dfClaraK$cluster, by = list(dfClaraK$pattern), FUN = "mean")
+colnames(dfClaraK) <- c("pattern","weight")
+dfClaraK$pattern <- make_patterns_compound(dfClaraK$pattern) #for merging lat
+saveRDS(dfClaraK, file = "dfClaraKJaccard.RDS")
+```
+

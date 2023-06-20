@@ -5,10 +5,10 @@ corpus_preparation <- function(dataframe){
   corp <- corpus(dataframe$speech_content, docvars = data.frame(docname = dataframe$id, party = dataframe$party))
   toks <- tokens(corp, remove_punct = T, remove_symbols = T, remove_numbers = T, remove_url = TRUE,
                  remove_separators = T, include_docvars = T, split_hyphens = F)
-  toks <- tokens_tolower(toks)
+  toks <- tokens_tolower(toks, keep_acronyms = FALSE)
   toks <- tokens_remove(toks, stopwords("german"))
   toks <- tokens_remove(toks, greeting_phrases)
-  toks_compund <- get_pop_tokens1(
+  toks_compund <- get_pop_tokens_updated(
     corp,
     create_compounds = T,
     compounds_at_level = "sentences",

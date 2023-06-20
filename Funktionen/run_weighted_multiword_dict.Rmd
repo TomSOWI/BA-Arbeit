@@ -1,0 +1,236 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "13 6 2023"
+output: html_document
+---
+
+### Dictionary context
+
+
+
+
+
+```{r}
+
+```
+
+
+```{r}
+corp_expert_preparation <- function(corp, pattern){
+  toks <- tokens(corp, remove_punct = T, remove_symbols = T, remove_numbers = T,remove_url = TRUE,
+      remove_separators = T, include_docvars = T, split_hyphens = F) 
+  toks <- tokens_tolower(toks, keep_acronyms = FALSE)
+  #tokens remove greeting phrases
+  toks <- get_pop_tokens_updated(corp,create_compounds = T,compounds_dict = pattern,compounds_at_level = "sentences")
+  corp <- vapply(toks, paste, FUN.VALUE = character(1), collapse = " ") %>%
+  corpus()
+}
+```
+
+
+
+```{r}
+#corp = corpus objekt 
+#pattern = original patterns (hier: gruendl_compound)
+#pattern_weight = resultat des clusterings (df mit pattern und weight)
+run_weighted_multiword_dict <- function(corp,corp_compund,pattern,pattern_weight, prepare_corp = F){
+  
+  if(prepare_corp == TRUE){
+    corp <- corp_expert_preparation(corp)
+  }
+  df_kwic <- kwic(corp_compund, pattern = pattern,valuetype = "regex", window = 1, case_insensitive = T)
+  
+  #apply weighted dictionary
+  merged <- merge(pattern_weight,as.data.frame(df_kwic), by = "pattern")
+  merged$no_weight <- 1 #apply ordinary dictionary
+  #aggregating weights by text
+  merged <- merged %>%
+    select(docname,no_weight,weight)%>%
+    group_by(docname)%>%
+    reframe(
+      dictionary = sum(no_weight),
+      weight = sum(weight)
+    )
+    #tmp_corpus <- quanteda::corpus_reshape(corp, to = "sentences")
+    n_sentences <- data.frame(docname = quanteda::docid(corp), n_sentences = quanteda::nsentence(corp), 
+    party = docvars(corp)$party)
+    result <- merge(merged,n_sentences, by = "docname")
+    result <- group_by(result, party)
+}
+
+
+```
+
+
+
+### 2014
+
+
+```{r}
+corp2014 <- corpus(df2014, text_field = "speech_content")
+saveRDS(corp2014, file = "corp2014")
+corp_2014clean <- corp_expert_preparation(corp2014, pattern = popdictR::gruendl_terms)
+saveRDS(corp_2014_clean, file = "corp_2014_clean.RDS")
+
+
+pattern <- gruendl_patterns_to_compound()
+
+result2014Clara <- run_weighted_multiword_dict2(corp = corp2014, corp_compund = corp_2014_clean, pattern = pattern, pattern_weight = dfClaraJaccard, include_main_dict = TRUE,include_totals = TRUE)
+
+result2014ClaraK <- run_weighted_multiword_dict2(corp = corp2014, corp_compund = corp_2014_clean, pattern = pattern, pattern_weight = dfClaraKJaccard, include_main_dict = T,include_totals = T)
+
+result2014Kmeans <- run_weighted_multiword_dict2(corp = corp2014, corp_compund = corp_2014_clean, pattern = pattern, pattern_weight = dfKmeans, include_main_dict = T,include_totals = T)
+
+result2014KmeansK <- run_weighted_multiword_dict2(corp = corp2014, corp_compund = corp_2014_clean, pattern = pattern, pattern_weight = dfKmeansK, include_main_dict = T,include_totals = T)
+
+
+
+
+validation2014Clara <- merge(result2014Clara, exp_2014)
+
+
+cor(x = validation2014$, y = validation2014$expert_rating, method = "pearson")
+cor(x = validation2014$kmeans, y = validation2014$expert_rating, method = "pearson")
+
+
+
+gt_cor <- gt(df_cor,rowname_col = "Jahre") %>%  
+  tab_header(
+   title = "Tabelle 4: Diktionäre im Vergleich",
+   subtitle = "Zusammenhang zwischen Diktionärrating und Expertenbefragung nach Jahren") #%>%
+   #gtsave("gt_cor.tex")
+
+
+
+
+
+
+
+
+
+
+summary2014 <- result2014 %>%
+  group_by(party) %>%
+  reframe(
+    sentences   = sum(n_sentences),
+    gruendl     = sum(dictionary) / sentences ,
+    kmeans     = sum(weight) / sentences
+  ) %>%
+  ungroup
+
+
+summary2014$kmeans <- scale(summary2014$kmeans,center = T)
+summary2014$gruendl <- scale(summary2014$gruendl,center = T)
+summary2014$party[summary2014$party == "DIE LINKE."] <- "LINKE"
+
+validation2014 <- merge(summary2014, exp_2014)
+
+
+cor(x = validation2014$gruendl, y = validation2014$expert_rating, method = "pearson")
+cor(x = validation2014$kmeans, y = validation2014$expert_rating, method = "pearson")
+
+
+popdictR::gruendl_terms
+```
+
+
+
+
+
+
+
+```{r}
+df_kwic <- kwic(corp_2014_clean, pattern,valuetype = "regex", window = 1, case_insensitive = T)
+merged <- merge(dfClaraJaccard,as.data.frame(df_kwic), by = "pattern")
+  
+    merged$no_weight <- 1 
+    merged <- merged %>%
+      select(docname,no_weight,weight) %>%
+      group_by(docname) %>%
+      reframe(
+        dictionary = sum(no_weight),
+        weight = sum(weight)
+      )
+    
+    
+party <- data.frame(docname = quanteda::docid(corp),party = docvars(corp)$party)
+result <- merge(merged, party, by = "docname")
+
+result <- result %>%
+  select(party,weight,dictionary) %>%
+  group_by(party) %>%
+   reframe(
+        dictionary = sum(dictionary),
+        weight = sum(weight)
+      )
+
+   n_sentences <- data.frame(n_sentences = as.numeric(quanteda::nsentence(corp)),
+                                party = docvars(corp)$party)
+      n_sentences <- n_sentences %>%
+        group_by(party) %>%
+        reframe(
+          n_sentences = sum(n_sentences)
+        )
+        
+      
+      
+aggregate(n_sentences, by = list(n_sentences$party), FUN = "sum")
+
+?aggregate
+      
+      result <- merge(result, n_sentences, by = "party")
+```
+
+
+
+
+
+
+
+
+#Run multiple multidicts
+
+```{r}
+dictionary_list <- #add all weights
+  i = 0
+for (d in dictionary_list){
+  result <- run_weighted_multiword_dict(corp = corp_2014, corp_compund = corp_2014_clean, pattern = pattern, pattern_weight = d)
+  i = i + 1
+  if (i)
+}
+
+
+```
+
+
+
+### 2017
+
+```{r}
+corp_2017 <- corpus(df_2017, text_field = "speech_content")
+corp_2017_clean <- corp_expert_preparation(corp_2017, pattern = popdictR::gruendl_terms)
+saveRDS(corp_2017_clean, "corp_2017_clean.RDS")
+```
+
+
+### 2019
+
+```{r}
+corp_2019 <- corpus(df_2019, text_field = "speech_content")
+corp_2019_clean <- corp_expert_preparation(corp_2019, pattern = popdictR::gruendl_terms)
+saveRDS(corp_2019_clean, "corp_2019_clean.RDS")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+

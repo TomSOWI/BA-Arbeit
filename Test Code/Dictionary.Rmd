@@ -1,0 +1,57 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "13 4 2023"
+output: html_document
+---
+
+```{r setup, warning=FALSE,echo=FALSE}
+
+library(quanteda)
+library(quanteda.textplots)
+library(tidyverse)
+library(wordcloud2)
+library(dbscan)
+library(tm)
+devtools::install_github("jogrue/regexhelpeR")
+devtools::install_github("jogrue/multidictR")
+devtools::install_github("jogrue/popdictR")
+
+```
+
+### Corpus cleaning
+```{r}
+corp_BT20 <- corpus(BT17_20, text_field = "speech_content") #Corpus hier ändern
+token_BT20 <- tokens(corp_BT20,  remove_number =T)
+class(token_BT20)
+
+#Cleaning
+
+token_BT20 <- tokens_remove(token_BT20 , stopwords("german"))
+token_BT20 <- tokens_remove(token_BT20 , c(".","!","?"))
+token_BT20 <- tokens_remove(token_BT20, c("„", "“","–", "–", "…", "@","(",")","{","}",",",":","-",";"))
+token_BT20 <- tokens_remove(token_BT20, '"')
+
+```
+### Kontext Dictionary
+
+```{r}
+dict <- dictionary(list(populismus = terms))
+is.dictionary(dict)
+
+df_BT20 <- kwic(token_BT20, pattern = dict$populismus, valuetype = "regex", window = 5) #window 
+#df_BT20 <- kwic(corp_BT20, pattern = dict$populismus, valuetype = "regex") CORPUS
+
+
+df <- df_BT20 %>%
+  group_by(pattern,keyword) %>%
+  reframe(
+    pervious = pre,
+    after = post
+    #sentence = paste0(df_BT20$pre, df_BT20$keyword, df_BT20$post, sep = " ")
+  )
+
+#df$sentence = paste(df_BT20$pre, df_BT20$keyword, sep = " ")
+df$sentence = paste(df_BT20$pre, df$after, sep = " ")
+```
+
