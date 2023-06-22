@@ -22,3 +22,4 @@ corpus_preparation <- function(dataframe){
   assign("docvars", df,  envir = globalenv()) # für corpus_to_poppulism_context_df
   corp <- corpus(docvars, text_field = "corp")
 }
+

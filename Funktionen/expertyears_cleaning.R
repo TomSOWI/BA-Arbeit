@@ -12,3 +12,10 @@ corp_preparation_expertyears <- function(corp, pattern){
   corp <- vapply(toks, paste, FUN.VALUE = character(1), collapse = " ") %>%
     corpus()
 }
+
+expertyears_cleaning <- function(corp, pattern){
+  toks <- get_pop_tokens_updated(corp,create_compounds = T,compounds_dict = pattern,compounds_at_level = "sentences")
+  docnames(toks) <- docvars(corp)$id
+}
+
+

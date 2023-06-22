@@ -1,83 +1,75 @@
 
 
-
-
 #############################################################
-# Run one weighted dictionary
+# Adjustment for identifier
 #############################################################
+
 
 run_weighted_multiword_dict <- function(
-  corp,
-  corp_compund,
-  pattern,
-  pattern_name = "original",
-  pattern_weight,
-  pattern_weight_name = "weighted",
+  data,
+  dict_compound,
+  dict_name = "original",
+  dict_weight,
+  dict_weight_name = "weighted",
   prepare_corp = FALSE,
   include_main_dict = TRUE,
   include_totals = TRUE
-  
-  )
-  {
-  
-  if(prepare_corp == TRUE){
-    corp <- corp_expert_preparation(corp)
+)
+{
+  if (prepare_corp == TRUE) {
+    data <- expertyears_cleaning(data)
   }
   
-  df_kwic <- kwic(corp_compund, pattern = pattern,valuetype = "regex", window = 1, case_insensitive = T)
-  merged <- merge(pattern_weight,as.data.frame(df_kwic), by = "pattern")
+  df_kwic <- kwic(data, pattern = dict_compound, valuetype = "regex", window = 1, case_insensitive = T)
+  merged <- merge(dict_weight, as.data.frame(df_kwic), by = "pattern")
+  party <- data.frame(docname = quanteda::docnames(data), party = docvars(data)$party)
   
-  if (include_main_dict == TRUE){
-    merged$no_weight <- 1 
+  if (include_main_dict == TRUE) {
+    merged$dict <- 1 
     merged <- merged %>%
-      select(docname,no_weight,weight) %>%
+      select(docname, dict, weight) %>%
       group_by(docname) %>%
-      reframe(
-        dictionary = sum(no_weight),
+      summarize(
+        dict = sum(dict),
         weight = sum(weight)
       )
-    party <- data.frame(docname = quanteda::docid(corp),party = docvars(corp)$party)
     result <- merge(merged, party, by = "docname")
     result <- result %>%
-      select(party,weight,dictionary) %>%
+      select(party, dict, weight) %>%
       group_by(party) %>%
-      reframe(
-        dictionary = sum(dictionary),
+      summarize(
+        dict = sum(dict),
         weight = sum(weight)
       )
-    colnames(result) <- c("party",pattern_name, pattern_weight_name)
-    
-  } else{
+    colnames(result) <- c("party", dict_name, dict_weight_name)
+  } else {
     merged <- merged %>%
-      select(docname,weight)%>%
-      group_by(docname)%>%
-      reframe(
-       weight = sum(weight) 
+      select(docname, weight) %>%
+      group_by(docname) %>%
+      summarize(
+        weight = sum(weight) 
       )
-    party <- data.frame(docname = quanteda::docid(corp),party = docvars(corp)$party)
     result <- merge(merged, party, by = "docname")
     result <- result %>%
-      select(party,weight) %>%
+      select(party, weight) %>%
       group_by(party) %>%
-      reframe(
+      summarize(
         weight = sum(weight)
       )
-    colnames(result) <- c("party",pattern_weight_name)
+    colnames(result) <- c("party", pattern_weight_name)
   }
-
   
-  if (include_totals == TRUE){
-    n_sentences <- data.frame(n_sentences = as.numeric(quanteda::nsentence(corp)),
-                              party = docvars(corp)$party)
+  if (include_totals == TRUE) {
+    n_sentences <- data.frame(n_sentences = docvars(data)$n_sentences, party = docvars(data)$party)
     n_sentences <- n_sentences %>%
       group_by(party) %>%
-      reframe(
+      summarize(
         n_sentences = sum(n_sentences)
       )
-      result <- merge(result, n_sentences, by = "party")
+    result <- merge(result, n_sentences, by = "party")
   }
+  
   return(result)
 }
-
 
 

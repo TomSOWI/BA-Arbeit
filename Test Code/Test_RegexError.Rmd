@@ -6,6 +6,62 @@ output: html_document
 ---
 
 
+
+
+
+```{r}
+df_kwic4 <- kwic(corp_2019_clean, pattern = pattern , valuetype = "regex", window = 1, case_insensitive = T)
+
+df_kwic4 <- as.data.frame(df_kwic4)
+df_kwic4$gruendl <- 1
+df_kwic4 <- df_kwic4 %>%
+  select(docname, gruendl) %>%
+  group_by(docname) %>%
+  reframe(
+    gruendl = sum(gruendl)
+  )
+party <- data.frame(docname = quanteda::docid(corp),party = docvars(corp)$party)
+result <- merge(df_kwic4, party, by = "docname")
+
+result <- result %>%
+      select(party, gruendl) %>%
+      group_by(party) %>%
+      reframe(
+        dictionary = sum(gruendl)
+      )
+#sentences
+
+ n_sentences <- data.frame(n_sentences = as.numeric(quanteda::nsentence(corp)),
+                              party = docvars(corp)$party)
+    n_sentences <- n_sentences %>%
+      group_by(party) %>%
+      reframe(
+        n_sentences = sum(n_sentences)
+      )
+      result <- merge(result, n_sentences, by = "party")
+      
+#
+result$dictionary <- result$dictionary / result$n_sentences
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ### Pre Processing
 ```{r}
 library(quanteda)
@@ -18,8 +74,8 @@ devtools::install_github("jogrue/popdictR")
 
 ```{r}
 df <- readRDS("~/Documents/Uni Stuttgart/BachelorarbeitPopulismus/Code/TestData.RDS") #Pfad anpassen
-corp <- corpus(df_2014, text_field = "speech_content")
-
+#corp <- corpus(df_2019, text_field = "speech_content")
+corp <- corp2019
 toks <- tokens(corp, remove_punct = T, remove_symbols = T, remove_numbers = T,remove_url = TRUE,
       remove_separators = T, include_docvars = T, split_hyphens = F) #sep is true !!!!!!!
 toks <- tokens_tolower(toks, keep_acronyms = FALSE)
@@ -235,14 +291,14 @@ compund_sentence2 <- make_compounds1(
   optimize_regex = TRUE)
 
 
-compund_sentence3 <- get_pop_tokens1(
+compund_sentence3 <- get_pop_tokens_updated(
   corp,
   create_compounds = T,
   compounds_at_level = "sentences",
   compounds_dict = popdictR::gruendl_terms,
   compounds_dict_glob = FALSE
 )
-saveRDS(compund_sentence3, file = "compound_sentence2014.RDS")
+saveRDS(compund_sentence3, file = "compound_sentence2019.RDS")
 
 corp_compund_sentence3 <- vapply(compound_sentence2014, paste, FUN.VALUE = character(1), collapse = " ") %>%
   corpus()
@@ -260,10 +316,38 @@ terms_optimized <- regexhelpeR::optimize_regex_patterns(terms_lazy)
 
 #regexhelpeR::optimize_regex_patterns(regexhelpeR::make_all_regex_lazy("(wollen|(ein)?fordern|möchten|mögen|verlangen|beanspruc#hen|wünschen)_(.*_)?bürger(innen)?"))
 
-df_kwic4 <- kwic(corp_compund_sentence3, pattern = terms_underscore  , valuetype = "regex", window = 1, case_insensitive = T)
-#2033 #1988
-df_kwic3 <- kwic(compund_sentence3, pattern = terms_underscore , valuetype = "regex", window = 1, case_insensitive = T)
-table(df_kwic3$pattern)
+df_kwic4 <- kwic(corp_2019_clean, pattern = pattern , valuetype = "regex", window = 1, case_insensitive = T)
+
+df_kwic4 <- as.data.frame(df_kwic4)
+df_kwic4$gruendl <- 1
+df_kwic4 <- df_kwic4 %>%
+  select(docname, gruendl) %>%
+  group_by(docname) %>%
+  reframe(
+    gruendl = sum(gruendl)
+  )
+party <- data.frame(docname = quanteda::docid(corp),party = docvars(corp)$party)
+result <- merge(df_kwic4, party, by = "docname")
+
+result <- result %>%
+      select(party, gruendl) %>%
+      group_by(party) %>%
+      reframe(
+        dictionary = sum(gruendl)
+      )
+#sentences
+
+ n_sentences <- data.frame(n_sentences = as.numeric(quanteda::nsentence(corp)),
+                              party = docvars(corp)$party)
+    n_sentences <- n_sentences %>%
+      group_by(party) %>%
+      reframe(
+        n_sentences = sum(n_sentences)
+      )
+      result <- merge(result, n_sentences, by = "party")
+      
+#
+result$dictionary <- result$dictionary / result$n_sentences
 
 ```
 
