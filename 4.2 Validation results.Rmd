@@ -13,20 +13,60 @@ output: html_document
 corp2014 <- corpus(df2014, text_field = "speech_content")
 saveRDS(corp2014, file = "corp2014.RDS")
 corp_2014clean <- expertyears_cleaning(corp2014, pattern = popdictR::gruendl_terms)
-saveRDS(corp_2014_clean, file = "corp_2014_clean.RDS")
+saveRDS(corp_2014clean, file = "corp_2014_clean.RDS")
 
 
 pattern <- gruendl_patterns_to_compound()
 
-result2014Clara <- run_weighted_multiword_dict(corp = corp2014, corp_compund = corp_2014_clean, pattern = pattern, pattern_name = "gruendl", pattern_weight = dfClaraJaccard, pattern_weight_name = "clara", include_main_dict = TRUE,include_totals = TRUE)
 
-result2014ClaraK <- run_weighted_multiword_dict(corp = corp2014, corp_compund = corp_2014_clean, pattern = pattern, pattern_weight = dfClaraKJaccard,pattern_weight_name = "claraK", include_main_dict = F,include_totals = F)
 
-result2014Kmeans <- run_weighted_multiword_dict(corp = corp2014, corp_compund = corp_2014_clean, pattern = pattern, pattern_weight = dfKmeans, pattern_weight_name = "kmeans", include_main_dict = F,include_totals = F)
+result2014Clara <- run_weighted_multiword_dict(
+  data = corp_2014_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfCalaraJaccard,
+  dict_weight_name = "clara",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = TRUE
+)
 
-result2014KmeansK <- run_weighted_multiword_dict(corp = corp2014, corp_compund = corp_2014_clean, pattern = pattern, pattern_weight = dfKmeansK, pattern_weight_name = "kmeansK", include_main_dict = F,include_totals = F)
+result2014ClaraK <- run_weighted_multiword_dict(
+  data = corp_2014_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfCalaraKJaccard,
+  dict_weight_name = "claraK",
+  prepare_corp = FALSE,
+  include_main_dict = FALSE,
+  include_totals = FALSE,
+)
 
-result2014 <- bind_cols(result2014Clara,select(result2014ClaraK, claraK), select(result2014Kmeans, kmeans), select(result2014KmeansK, kmeansK))
+result2014Kmeans <- run_weighted_multiword_dict(
+  data = corp_2014_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfKmeans,
+  dict_weight_name = "kmeans",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
+
+result2014KmeansK <- run_weighted_multiword_dict(
+  data = corp_2014_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfKmeans,
+  dict_weight_name = "kmeansK",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
+
+result2014 <- bind_cols(result2014Clara,select(result2014ClaraK, claraK),
+                        select(result2014Kmeans, kmeans), 
+                        select(result2014KmeansK, kmeansK))
 
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
@@ -54,21 +94,62 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 ```{r}
 corp2017 <- corpus(df2017, text_field = "speech_content")
 saveRDS(corp2017, file = "corp2017.RDS")
-corp_2017clean <- expertyears_cleaning(corp2017, pattern = popdictR::gruendl_terms)
-saveRDS(corp_2017_clean, file = "corp_2017_clean.RDS")
+corp_2017clean <- expertyears_cleaning(corp = corp2017, pattern = popdictR::gruendl_terms)
+saveRDS(corp_2017clean, file = "corp_2017_clean.RDS")
+
+
 
 
 pattern <- gruendl_patterns_to_compound()
 
-result2017Clara <- run_weighted_multiword_dict(corp = corp2017, corp_compund = corp_2017_clean, pattern = pattern, pattern_name = "gruendl", pattern_weight = dfClaraJaccard, pattern_weight_name = "clara", include_main_dict = TRUE,include_totals = TRUE)
+result2017Clara <- run_weighted_multiword_dict(
+  data = corp_2017_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfCalaraJaccard,
+  dict_weight_name = "clara",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = TRUE
+)
 
-result2017ClaraK <- run_weighted_multiword_dict(corp = corp2017, corp_compund = corp_2017_clean, pattern = pattern, pattern_weight = dfClaraKJaccard,pattern_weight_name = "claraK", include_main_dict = F,include_totals = F)
 
-result2017Kmeans <- run_weighted_multiword_dict(corp = corp2017, corp_compund = corp_2017_clean, pattern = pattern, pattern_weight = dfKmeans, pattern_weight_name = "kmeans", include_main_dict = F,include_totals = F)
+result2017ClaraK <- run_weighted_multiword_dict(
+  data = corp_2017_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfCalaraKJaccard,
+  dict_weight_name = "claraK",
+  prepare_corp = FALSE,
+  include_main_dict = FALSE,
+  include_totals = FALSE,
+)
 
-result2017KmeansK <- run_weighted_multiword_dict(corp = corp2017, corp_compund = corp_2017_clean, pattern = pattern, pattern_weight = dfKmeansK, pattern_weight_name = "kmeansK", include_main_dict = F,include_totals = F)
+result2017Kmeans <- run_weighted_multiword_dict(
+  data = corp_2017_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfKmeans,
+  dict_weight_name = "kmeans",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
 
-result2017 <- bind_cols(result2017Clara,select(result2017ClaraK, claraK), select(result2017Kmeans, kmeans), select(result2017KmeansK, kmeansK))
+result2017KmeansK <- run_weighted_multiword_dict(
+  data = corp_2017_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfKmeans,
+  dict_weight_name = "kmeansK",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
+
+result2017 <- bind_cols(result2017Clara,select(result2017ClaraK, claraK),
+                        select(result2017Kmeans, kmeans), 
+                        select(result2017KmeansK, kmeansK))
 
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
@@ -97,21 +178,61 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 ```{r}
 corp2019 <- corpus(df2019, text_field = "speech_content")
 saveRDS(corp2019, file = "corp2019.RDS")
-corp_2019clean <- expertyears_cleaning(corp2019, pattern = popdictR::gruendl_terms)
-saveRDS(corp_2019_clean, file = "corp_2019_clean.RDS")
+corp_2019clean <- expertyears_cleaning(corpus(TestData, text_field = "speech_content"), pattern = popdictR::gruendl_terms)
+saveRDS(corp_2019clean, file = "corp_2019_clean.RDS")
+
+
 
 
 pattern <- gruendl_patterns_to_compound()
 
-result2019Clara <- run_weighted_multiword_dict(corp = corp2019, corp_compund = corp_2019_clean, pattern = pattern, pattern_name = "gruendl", pattern_weight = dfClaraJaccard, pattern_weight_name = "clara", include_main_dict = TRUE,include_totals = TRUE)
+result2019Clara <- run_weighted_multiword_dict(
+  data = corp_2019_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfCalaraJaccard,
+  dict_weight_name = "clara",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = TRUE
+)
 
-result2019ClaraK <- run_weighted_multiword_dict(corp = corp2019, corp_compund = corp_2019_clean, pattern = pattern, pattern_weight = dfClaraKJaccard,pattern_weight_name = "claraK", include_main_dict = F,include_totals = F)
+result2019ClaraK <- run_weighted_multiword_dict(
+  data = corp_2019_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfCalaraKJaccard,
+  dict_weight_name = "claraK",
+  prepare_corp = FALSE,
+  include_main_dict = FALSE,
+  include_totals = FALSE,
+)
 
-result2019Kmeans <- run_weighted_multiword_dict(corp = corp2019, corp_compund = corp_2019_clean, pattern = pattern, pattern_weight = dfKmeans, pattern_weight_name = "kmeans", include_main_dict = F,include_totals = F)
+result2019Kmeans <- run_weighted_multiword_dict(
+  data = corp_2019_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfKmeans,
+  dict_weight_name = "kmeans",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
 
-result2019KmeansK <- run_weighted_multiword_dict(corp = corp2019, corp_compund = corp_2019_clean, pattern = pattern, pattern_weight = dfKmeansK, pattern_weight_name = "kmeansK", include_main_dict = F,include_totals = F)
+result2019KmeansK <- run_weighted_multiword_dict(
+  data = corp_2019_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfKmeans,
+  dict_weight_name = "kmeansK",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
 
-result2019 <- bind_cols(result2019Clara,select(result2019ClaraK, claraK), select(result2019Kmeans, kmeans), select(result2019KmeansK, kmeansK))
+result2019 <- bind_cols(result2019Clara,select(result2019ClaraK, claraK),
+                        select(result2019Kmeans, kmeans), 
+                        select(result2019KmeansK, kmeansK))
 
 result2019$party[result2019$party == "DIE LINKE."] <- "LINKE"
 result2019$party[result2019$party == "Fraktionslos"] <- NA
@@ -313,7 +434,7 @@ docvars(toks)$n_sentences <- quanteda::nsentence(corp)
 
 ### ----------------------------------------------------------------------------
 
-i <- run_weighted_multiword_dict2(
+i <- run_weighted_multiword_dict(
   data = toks,
   dict_compound = pattern,
   dict_name = "original",

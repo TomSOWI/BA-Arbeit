@@ -17,7 +17,7 @@ get_pop_tokens_updated <- function(
   # Create compounds if param is set
   if (create_compounds & !is.null(compounds_dict)) {
     # Compounds are created
-    text <- make_compounds1(
+    text <- make_compounds1( #Meine Änderung
       text = text,
       patterns = compounds_dict,
       at_level = compounds_at_level,
@@ -30,7 +30,7 @@ get_pop_tokens_updated <- function(
   ### Here the default settings for the tokenizer are made ###
   toks <- quanteda::tokens(
     text,
-    what = "word",
+    what = "word",  
     remove_punct = TRUE,
     remove_symbols = TRUE,
     remove_numbers = TRUE,

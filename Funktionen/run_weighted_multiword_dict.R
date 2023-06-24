@@ -60,13 +60,14 @@ run_weighted_multiword_dict <- function(
   }
   
   if (include_totals == TRUE) {
-    n_sentences <- data.frame(n_sentences = docvars(data)$n_sentences, party = docvars(data)$party)
-    n_sentences <- n_sentences %>%
+    totals <- data.frame(n_sentences = docvars(data)$n_sentences, n_tokens = docvars(data)$n_tokens,party = docvars(data)$party)
+    totals <- totals %>%
       group_by(party) %>%
       summarize(
-        n_sentences = sum(n_sentences)
+        n_sentences = sum(n_sentences),
+        n_tokens = sum(n_tokens)
       )
-    result <- merge(result, n_sentences, by = "party")
+    result <- merge(result, totals, by = "party")
   }
   
   return(result)

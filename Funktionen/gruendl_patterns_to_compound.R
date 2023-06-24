@@ -17,3 +17,12 @@ make_patterns_compound <- function(pattern){
   terms_underscore <- stringi::stri_replace_all_fixed(terms_underscore, "(_.*?)?", "_[^_]")
 }
 
+gruendl_patterns_to_underscore <- function(){
+  terms <- popdictR::gruendl_terms
+  #terms_lazy <- regexhelpeR::make_all_regex_lazy(terms)
+  terms_underscore <- stringi::stri_replace_all_fixed(terms," ", "_")
+ #terms_underscore <- stringi::stri_replace_all_fixed(terms_underscore, "(.*?_)?", "[^_]*_")
+ # terms_underscore <- stringi::stri_replace_all_fixed(terms_underscore, "(_.*?)?", "_[^_]")
+  return(terms_underscore)
+}
+
