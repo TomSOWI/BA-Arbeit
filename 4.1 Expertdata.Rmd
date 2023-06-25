@@ -135,6 +135,7 @@ exp_2014$party[exp_2014$party == "CDU"] <- "CDU/CSU"
 
 #Parteien im Bundestag 2014 auswählen
 exp_2014 <- exp_2014 %>% filter(party %in% c("CDU/CSU","SPD","Grüne","LINKE"))
+exp_2014_afd <- exp_2014 %>% filter(party %in% c("CDU/CSU","SPD","Grüne","LINKE","AfD"))
 
 #Z-Transformation
 exp_2014$expert_rating <- as.numeric(exp_2014$antielite_salience)
@@ -147,3 +148,22 @@ exp_2014$antielite_salience <- NULL
 saveRDS(exp_2014, file = "exp2014.RDS")
 
 ```
+
+### CHES 2014 AfD
+
+
+```{r}
+exp_2014_afd <- exp_2014 %>% filter(party %in% c("CDU/CSU","SPD","Grüne","LINKE","AfD"))
+
+#Z-Transformation
+exp_2014_afd$expert_rating <- as.numeric(exp_2014_afd$antielite_salience)
+exp_2014_afd$expert_rating_z <- scale(exp_2014_afd$expert_rating, center = T)
+
+#Remove
+exp_2014_afd$antielite_salience <- NULL
+
+
+saveRDS(exp_2014_afd, file = "exp2014_afd.RDS")
+
+```
+

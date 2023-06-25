@@ -2,6 +2,8 @@ greeting_phrases <- c("liebe frau präsidentin","lieber herr präsident","herr p
 
 
 corpus_preparation <- function(dataframe){
+  
+  
   corp <- corpus(dataframe$speech_content, docvars = data.frame(docname = dataframe$id, party = dataframe$party))
   toks <- tokens(corp, remove_punct = T, remove_symbols = T, remove_numbers = T, remove_url = TRUE,
                  remove_separators = T, include_docvars = T, split_hyphens = F)
@@ -23,3 +25,17 @@ corpus_preparation <- function(dataframe){
   corp <- corpus(docvars, text_field = "corp")
 }
 
+corpus_preparation <- function(corpus, dict){
+  expertyears_cleaning(corpus,dict)
+  
+  
+  
+  toks <- tokens_remove(toks, greeting_phrases)
+  toks_compund <- get_pop_tokens_updated(
+    corp,
+    create_compounds = T,
+    compounds_at_level = "sentences",
+    compounds_dict = popdictR::gruendl_terms,
+    compounds_dict_glob = FALSE
+ 
+}

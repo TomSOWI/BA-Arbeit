@@ -50,5 +50,21 @@ distBT17_jaccard <- distance_matrix(dfBT17, method = "jaccard")
 saveRDS(distBT17_jaccard, file = "distBT17_jaccard.RDS")
 ```
 
+#####
+#Pre_processing updated
+#####
+
+
+```{r}
+greeting_phrases <- c("liebe frau präsidentin","lieber herr präsident","herr präsident","frau präsidentin","sehr geehrter","sehr geehrte","liebe kolleginnen und kollegen","meine sehr verehrten damen und herren","verehrte kolleginnen und kollegen","geehrte kolleginnen und kollegen","herr parlamentspräsident","frau parlamentspräsidentin","herr minister","frau ministerin","herr staatssekretär","frau staatssekretärin","herr alterspräsident","frau altpräsidentin")
 ```
+
+```{r}
+corpBT18 <- corpus(BT18, text_field = "speech_content")
+corpBT18 <- gsub(corpBT18, greeting_phrases,"")
+tokensBT18 <- corpus_to_compund_tokens(corpBT18, popdictR::gruendl_terms)
+contextBT18 <- aggregate_context(tokensBT18, gruendl_patterns_to_underscore())
+
+```
+
 

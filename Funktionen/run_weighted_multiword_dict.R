@@ -56,7 +56,7 @@ run_weighted_multiword_dict <- function(
       summarize(
         weight = sum(weight)
       )
-    colnames(result) <- c("party", pattern_weight_name)
+    colnames(result) <- c("party", dict_weight_name)
   }
   
   if (include_totals == TRUE) {

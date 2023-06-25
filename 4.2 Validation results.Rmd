@@ -18,28 +18,28 @@ saveRDS(corp_2014clean, file = "corp_2014_clean.RDS")
 
 pattern <- gruendl_patterns_to_compound()
 
-
-
 result2014Clara <- run_weighted_multiword_dict(
   data = corp_2014_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfCalaraJaccard,
+  dict_weight = dfClaraJaccard,
   dict_weight_name = "clara",
   prepare_corp = FALSE,
   include_main_dict = TRUE,
   include_totals = TRUE
 )
 
+
+
 result2014ClaraK <- run_weighted_multiword_dict(
   data = corp_2014_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfCalaraKJaccard,
+  dict_weight = dfClaraKJaccard,
   dict_weight_name = "claraK",
   prepare_corp = FALSE,
-  include_main_dict = FALSE,
-  include_totals = FALSE,
+  include_main_dict = F,
+  include_totals = FALSE
 )
 
 result2014Kmeans <- run_weighted_multiword_dict(
@@ -49,7 +49,7 @@ result2014Kmeans <- run_weighted_multiword_dict(
   dict_weight = dfKmeans,
   dict_weight_name = "kmeans",
   prepare_corp = FALSE,
-  include_main_dict = TRUE,
+  include_main_dict = F,
   include_totals = FALSE
 )
 
@@ -60,7 +60,7 @@ result2014KmeansK <- run_weighted_multiword_dict(
   dict_weight = dfKmeans,
   dict_weight_name = "kmeansK",
   prepare_corp = FALSE,
-  include_main_dict = TRUE,
+  include_main_dict = F,
   include_totals = FALSE
 )
 
@@ -68,12 +68,14 @@ result2014 <- bind_cols(result2014Clara,select(result2014ClaraK, claraK),
                         select(result2014Kmeans, kmeans), 
                         select(result2014KmeansK, kmeansK))
 
+result2014$party[result2014$party == "DIE LINKE."] <- "LINKE"
+result2014 <- na.omit(result2014)
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
   result2014[[i]] <- result2014[[i]] / result2014$n_sentences
   result2014[[i]] <- scale(result2014[[i]], center = T)
 }
-result2014$party[result2014$party == "DIE LINKE."] <- "LINKE"
+
 validation2014 <- merge(result2014, exp2014)
 
 correlation2014 <- list()
@@ -106,7 +108,7 @@ result2017Clara <- run_weighted_multiword_dict(
   data = corp_2017_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfCalaraJaccard,
+  dict_weight = dfClaraJaccard,
   dict_weight_name = "clara",
   prepare_corp = FALSE,
   include_main_dict = TRUE,
@@ -114,15 +116,16 @@ result2017Clara <- run_weighted_multiword_dict(
 )
 
 
+
 result2017ClaraK <- run_weighted_multiword_dict(
   data = corp_2017_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfCalaraKJaccard,
+  dict_weight = dfClaraKJaccard,
   dict_weight_name = "claraK",
   prepare_corp = FALSE,
-  include_main_dict = FALSE,
-  include_totals = FALSE,
+  include_main_dict = F,
+  include_totals = FALSE
 )
 
 result2017Kmeans <- run_weighted_multiword_dict(
@@ -132,7 +135,7 @@ result2017Kmeans <- run_weighted_multiword_dict(
   dict_weight = dfKmeans,
   dict_weight_name = "kmeans",
   prepare_corp = FALSE,
-  include_main_dict = TRUE,
+  include_main_dict = F,
   include_totals = FALSE
 )
 
@@ -143,7 +146,7 @@ result2017KmeansK <- run_weighted_multiword_dict(
   dict_weight = dfKmeans,
   dict_weight_name = "kmeansK",
   prepare_corp = FALSE,
-  include_main_dict = TRUE,
+  include_main_dict = F,
   include_totals = FALSE
 )
 
@@ -151,12 +154,15 @@ result2017 <- bind_cols(result2017Clara,select(result2017ClaraK, claraK),
                         select(result2017Kmeans, kmeans), 
                         select(result2017KmeansK, kmeansK))
 
+result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
+result2017$party[result2017$party == "Fraktionslos"] <- NA
+result2017 <- na.omit(result2017)
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
   result2017[[i]] <- result2017[[i]] / result2017$n_sentences
   result2017[[i]] <- scale(result2017[[i]], center = T)
 }
-result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
+
 validation2017 <- merge(result2017, exp2017)
 
 correlation2017 <- list()
@@ -165,6 +171,7 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
     correlation <- cor(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
     correlation2017[[i]] <- correlation 
 }
+
 
 
 ```
@@ -190,22 +197,24 @@ result2019Clara <- run_weighted_multiword_dict(
   data = corp_2019_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfCalaraJaccard,
+  dict_weight = dfClaraJaccard,
   dict_weight_name = "clara",
   prepare_corp = FALSE,
   include_main_dict = TRUE,
   include_totals = TRUE
 )
 
+
+
 result2019ClaraK <- run_weighted_multiword_dict(
   data = corp_2019_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfCalaraKJaccard,
+  dict_weight = dfClaraKJaccard,
   dict_weight_name = "claraK",
   prepare_corp = FALSE,
-  include_main_dict = FALSE,
-  include_totals = FALSE,
+  include_main_dict = F,
+  include_totals = FALSE
 )
 
 result2019Kmeans <- run_weighted_multiword_dict(
@@ -215,7 +224,7 @@ result2019Kmeans <- run_weighted_multiword_dict(
   dict_weight = dfKmeans,
   dict_weight_name = "kmeans",
   prepare_corp = FALSE,
-  include_main_dict = TRUE,
+  include_main_dict = F,
   include_totals = FALSE
 )
 
@@ -226,7 +235,7 @@ result2019KmeansK <- run_weighted_multiword_dict(
   dict_weight = dfKmeans,
   dict_weight_name = "kmeansK",
   prepare_corp = FALSE,
-  include_main_dict = TRUE,
+  include_main_dict = F,
   include_totals = FALSE
 )
 
@@ -306,7 +315,7 @@ result2014 <- result2014Clara %>%
   rename("2014" = gruendl)
 result2014$party[result2014$party == "DIE LINKE."] <- "LINKE"
 
-result2014$'2014' <- round(result2014$'2014'/result2014$n_sentences * 100, digits = 3)
+result2014$'2014' <- round(result2014$'2014'/result2014$n_sentences * 100, digits = 2)
 result2014$n_sentences <- NULL
 result2014[nrow(result2014) + 1,] <- list("AfD", NA,NA)
 result2014[nrow(result2014) + 1,] <- list("FDP", NA,NA)
@@ -320,7 +329,7 @@ result2017 <- result2017Clara %>%
   rename("2017" = gruendl)
 result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
 
-result2017$'2017' <- round(result2017$'2017'/result2017$n_sentences * 100, digits = 3)
+result2017$'2017' <- round(result2017$'2017'/result2017$n_sentences * 100, digits = 2)
 result2017$n_sentences <- NULL
 
 ### 2019 -----------------------------------------------------------------------
@@ -332,7 +341,7 @@ result2019$party[result2019$party == "DIE LINKE."] <- "LINKE"
 result2019$party[result2019$party == "Fraktionslos"] <- NA
 result2019 <- na.omit(result2019)
 
-result2019$'2019' <- round(result2019$'2019'/result2019$n_sentences * 100, digits = 3)
+result2019$'2019' <- round(result2019$'2019'/result2019$n_sentences * 100, digits = 2)
 result2019$n_sentences <- NULL
 
 
@@ -360,89 +369,5 @@ gt(result,rowname_col = "party") %>%
 ```
 
 
-##############################
-## Vergleich mit Gruendl
-##############################
 
-
-```{r}
-
-result1.1 <- popdictR::run_popdict(corp_2019_clean) 
-result1.1 <- convert(result1.1, to = "data.frame")
-
-party <- data.frame(doc_id = quanteda::docid(corp_2019_clean),party = docvars(corp)$party)
-result1.1 <- merge(result1.1, party)
-
-party$doc_id == result1.1$doc_id
-
-result1.1 <- result1.1%>%
-  group_by(party) %>%
-  reframe(
-    sentences   = sum(n_sentences),
-    gruendl     = sum(dict_gruendl_2020) / sentences * 100,
-  ) %>%
-  ungroup
-
-result2 <- popdictR::run_popdict(corp2017) 
-result2 <- convert(result2, to = "data.frame")
-
-result2 <- result2%>%
-  group_by(party) %>%
-  reframe(
-    sentences   = sum(n_sentences),
-    gruendl     = sum(dict_gruendl_2020) / sentences * 100,
-  ) %>%
-  ungroup
-
-
-
-
-result3 <- popdictR::run_popdict(corp2014) 
-result3 <- convert(result3, to = "data.frame")
-
-
-result3 <- result3%>%
-  group_by(party) %>%
-  reframe(
-    sentences   = sum(n_sentences),
-    gruendl     = sum(dict_gruendl_2020) / sentences * 100,
-  ) %>%
-  ungroup
-
-
-```
-
-
-##############################
-## Weitere Tests
-##############################
-
-
-```{r}
-#corp <- corp2019
-
-corp <- corpus(TestData, text_field = "speech_content")
-
-toks <- get_pop_tokens_updated(corp,create_compounds = T,compounds_dict = popdictR::gruendl_terms,compounds_at_level = "sentences")
-#remove stoppwords?
-docnames(toks) <- docvars(corp)$id
-docvars(toks)$party <- docvars(corp)$party
-docvars(toks)$n_sentences <- quanteda::nsentence(corp)
-
-
-
-
-### ----------------------------------------------------------------------------
-
-i <- run_weighted_multiword_dict(
-  data = toks,
-  dict_compound = pattern,
-  dict_name = "original",
-  dict_weight = dfCalaraJaccard,
-  dict_weight_name = "weighted",
-  prepare_corp = FALSE,
-  include_main_dict = TRUE,
-  include_totals = TRUE
-)
-```
 
