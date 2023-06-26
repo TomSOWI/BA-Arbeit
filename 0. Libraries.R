@@ -2,6 +2,7 @@
 library(RPostgres)
 library(RPostgreSQL)
 library(quanteda)
+library(quanteda.textplots)
 #library(udpipe)
 #library(proxy)
 library(ggplot2)

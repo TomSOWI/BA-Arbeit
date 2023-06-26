@@ -105,94 +105,13 @@ mp2021 <- corp_mp_clean[corp_mp_clean$date == "2021",]
 
 ```
 
-
-#############################################################
-# compound
-#############################################################
-
-```{r}
-mp2013Clean <- expertyears_cleaning(corp = mp2013, pattern = popdictR::gruendl_terms)
-
-#mp2013Clean <- tokens_remove(mp2013Clean, c("__","c"))
-
-mp2013Clean[[5]]
-```
-
-
-
-#############################################################
-# Regex überarbeiten
-#############################################################
-
-##########################
-# Fixed Terms
-##########################
-
-
-
-```{r}
-
-### Total considered terms
- 
-t <- popdictR::gruendl_dictionary_complete
-terms_total <- popdictR::gruendl_dictionary_complete %>% select(Word,Sub_Type,Comment,duplicate, real_duplicate,wildcard)
-
-terms_total$filter <- ifelse(terms_total$Word %in% terms, 1,0)
-table(terms_total$filter)
-
-terms_df <- terms_total[terms_total$filter == 1,]
-terms_fixed <- terms_df[terms_df$wildcard != "regex" & !(terms_df$Word %in% c("hausverstand(s|es)?",	
-"staatsversagen(s)?","täusch(t|en)")),]
-terms_regex <- terms_df[terms_df$wildcard == "regex"| terms_df$Word %in% c("hausverstand(s|es)?",	
-"staatsversagen(s)?","täusch(t|en)"),]
-
-
-terms_fixed <- terms_fixed$Word
-terms_fixed <- stringi::stri_replace_all_fixed(terms_fixed," ", "_")
-terms_regex <- terms_regex$Word
-```
-
-```{r}
-
-terms_fixed  <- paste("\\b(_)?",terms_fixed ,"(_)?\\b",sep = "")
-
-df_kwic <- kwic(mp2013Clean[[6]], pattern = terms_fixed, valuetype = "regex", window = 1, case_insensitive = T)
-df_kwic2 <- kwic(mp2013Clean, pattern = terms_fixed, valuetype = "regex", window = 1, case_insensitive = T)
-
-
-#df_kwic2 <- kwic(mp2013Clean, pattern = pattern_us1, valuetype = "regex", window = 1, case_insensitive = T)
-```
-
-\b(_)?lug(_)?\b
-
-```{r}
-pattern_us <- gruendl_patterns_to_underscore()
-
-
-df_kwic_normal <- kwic(mp2013Clean[[6]], pattern = gruendl_patterns_to_underscore(), valuetype = "regex", window = 1, case_insensitive = T)
-df_kwic_normal2 <- kwic(mp2013Clean, pattern = gruendl_patterns_to_underscore(), valuetype = "regex", window = 1, case_insensitive = T)
-
-
-docvars(mp2013Clean)
-
-
-
-
-
-pattern_us1 <- paste("(_)?",pattern_us,"(_)?",sep = "")
-
-df_kwic <- kwic(mp2013Clean[[6]], pattern = pattern_us1, valuetype = "regex", window = 1, case_insensitive = T)
-df_kwic2 <- kwic(mp2013Clean, pattern = pattern_us1, valuetype = "regex", window = 1, case_insensitive = T)
-
-```
-
-
 ##########################
 ## 2013
 ##########################
 
-
 ```{r}
+mp2013Clean <- corpus_to_compound_tokens(corp = mp2013, pattern = popdictR::gruendl_terms)
+
 pattern <- gruendl_patterns_to_compound()
 
 
@@ -270,20 +189,11 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 ##########################
 
 ```{r}
-mp2017Clean <- expertyears_cleaning(corp = mp2017, pattern = popdictR::gruendl_terms)
+mp2017Clean <- corpus_to_compound_tokens(corp = mp2017, pattern = popdictR::gruendl_terms)
 
-#mp2017Clean <- tokens_remove(mp2017Clean, c("__","c"))
-
-mp2017Clean[[3]]
-mp2017[[3]]
-
-docvars(mp2017Clean)
 
 pattern <- gruendl_patterns_to_compound()
-```
 
-
-```{r}
 result2017Clara <- run_weighted_multiword_dict(
   data = mp2017Clean,
   dict_compound = pattern,
@@ -357,9 +267,7 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 
 
 ```{r}
-mp2021Clean <- expertyears_cleaning(corp = mp2021, pattern = popdictR::gruendl_terms)
-
-#mp2017Clean <- tokens_remove(mp2017Clean, c("__","c"))
+mp2021Clean <- corpus_to_compound_tokens(corp = mp2021, pattern = popdictR::gruendl_terms)
 
 
 result2021Clara <- run_weighted_multiword_dict(
