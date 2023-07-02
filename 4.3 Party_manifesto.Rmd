@@ -173,11 +173,13 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 result2013$party[result2013$party == "DIE LINKE."] <- "LINKE"
 validation2013 <- merge(result2013, exp_2014_afd)
 
+correlation2013P <- list()
 correlation2013 <- list()
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
-    correlation <- cor(x = validation2013[[i]], y = validation2013$expert_rating, method = "pearson")
-    correlation2013[[i]] <- correlation 
+    correlation <- cor.test(x = validation2013[[i]], y = validation2013$expert_rating, method = "pearson")
+    correlation2013P[[i]] <- correlation$p.value
+    correlation2013[[i]] <- correlation$estimate
 }
 
 
@@ -251,11 +253,13 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
 validation2017 <- merge(result2017, exp2017)
 
+correlation2017P <- list()
 correlation2017 <- list()
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
-    correlation <- cor(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
-    correlation2017[[i]] <- correlation 
+    correlation <- cor.test(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
+    correlation2017P[[i]] <- correlation$p.value
+    correlation2017[[i]] <- correlation$estimate
 }
 
 ```
@@ -327,11 +331,13 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 result2021$party[result2021$party == "DIE LINKE."] <- "LINKE"
 validation2021 <- merge(result2021, exp2019)
 
+correlation2021P <- list()
 correlation2021 <- list()
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
     correlation <- cor(x = validation2021[[i]], y = validation2021$expert_rating, method = "pearson")
-    correlation2021[[i]] <- correlation 
+    correlation2021P[[i]] <- correlation$p.value
+    correlation2021[[i]] <- correlation$estimate
 }
 
 ```
