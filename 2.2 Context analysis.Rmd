@@ -18,3 +18,11 @@ set.seed(100)
 textplot_wordcloud(dtmBT18)
 ```
 
+```{r}
+textplot(contextBT18$context, min_freq = 25)
+ 
+  
+```
+
+
+
