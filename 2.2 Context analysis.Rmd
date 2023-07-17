@@ -1,0 +1,28 @@
+---
+title: "2.2 Context analysis"
+author: "Tom Klotz"
+date: "26 6 2023"
+output: html_document
+---
+
+```{r}
+contextBT18 <- readRDS("~/Documents/Uni Stuttgart/BachelorarbeitPopulismus/Code/Contextdaten/contextBT18.RDS")
+contextBT18$context <- gsub("dass","",contextBT18$context)
+
+dtmBT18 <- dfm(contextBT18$context) %>%
+   dfm(remove = stopwords('german')) %>%
+    dfm_wordstem() %>%
+   dfm_trim(min_termfreq = 25, verbose = FALSE)
+
+set.seed(100)
+textplot_wordcloud(dtmBT18)
+```
+
+```{r}
+textplot(contextBT18$context, min_freq = 25)
+ 
+  
+```
+
+
+

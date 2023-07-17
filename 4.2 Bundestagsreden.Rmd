@@ -78,11 +78,13 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 
 validation2014 <- merge(result2014, exp2014)
 
+correlation2014P <- list()
 correlation2014 <- list()
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
-    correlation <- cor(x = validation2014[[i]], y = validation2014$expert_rating, method = "pearson")
-    correlation2014[[i]] <- correlation 
+    correlation <- cor.test(x = validation2014[[i]], y = validation2014$expert_rating, method = "pearson")
+    correlation2014P[[i]] <- correlation$p.value
+    correlation2014[[i]] <- correlation$estimate
 }
 
 
@@ -165,11 +167,13 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 
 validation2017 <- merge(result2017, exp2017)
 
+correlation2017P <- list()
 correlation2017 <- list()
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
-    correlation <- cor(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
-    correlation2017[[i]] <- correlation 
+    correlation <- cor.test(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
+    correlation2017P[[i]] <- correlation$p.value
+    correlation2017[[i]] <- correlation$estimate
 }
 
 
