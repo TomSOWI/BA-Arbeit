@@ -13,8 +13,14 @@ output: html_document
 #### BT17
  
 ```{r}
+
+toksBT17 <- contextBT17_clean
+toksBT17$party <- contextBT17$party
+
+contextBT17$
+
 set.seed(123)
-kmeansBT17 <- kmeans(distBT17_euclidean, k = 2, iter.max = 10, nstart = 2)
+kmeansBT17 <- kmeans(distBT17_euclidean, 2, iter.max = 10, nstart = 2)
 # Result
 kmeansBT17.image <-fviz_cluster(object = kmeansBT17, data = distBT17_euclidean,ellipse.type = "norm",
              geom = "point")
@@ -23,17 +29,23 @@ saveRDS(kmeansBT17, file = "kmeansBT17.RDS")
 saveRDS(kmeansBT17.image, file = "kmeansBT17.image.RDS")
 
 # Label asignment
-dfBT17$cluster <- kmeansBT17$cluster
-dfKmeansLinke <- dfBT17[dfBT17$party == "DIE LINKE.",] 
+toksBT17$cluster <- kmeansBT17$cluster
+dfKmeansLinke <- toksBT17[toksBT17$party == "DIE LINKE.",] 
 prop.table(table(dfKmeansLinke$cluster))
-dfBT17$cluster[dfBT17$cluster == 2] <- 0 # cluster one is populism
+# cluster two is populism
+contextBT17$cluster <- toksBT17$cluster - 1
+
+
 ```
  
 #### BT18
  
 ```{r}
+toksBT18 <- contextBT18_clean
+toksBT18$party <- contextBT18$party
+
 set.seed(123)
-kmeansBT18 <- kmeans(distBT18_euclidean, k = 2, iter.max = 10, nstart = 2)
+kmeansBT18 <- kmeans(distBT18_euclidean, 2, iter.max = 10, nstart = 2)
 # Result
 kmeansBT18.image <-fviz_cluster(object = kmeansBT18, data = distBT18_euclidean,ellipse.type = "norm",
              geom = "point")
@@ -42,17 +54,20 @@ saveRDS(kmeansBT18, file = "kmeansBT18.RDS")
 saveRDS(kmeansBT18.image, file = "kmeansBT18.image.RDS")
 
 # Label asignment
-dfBT18$cluster <- kmeansBT18$cluster
-dfKmeansLinke <- dfBT18[dfBT18$party == "DIE LINKE.",] 
+toksBT18$cluster <- kmeansBT18$cluster
+dfKmeansLinke <- toksBT18[toksBT18$party == "DIE LINKE.",] 
 prop.table(table(dfKmeansLinke$cluster))
-dfBT18$cluster <- dfBT18$cluster - 1 # cluster two is populisms
+contextBT18$cluster  <- toksBT18$cluster - 1 # cluster two is populisms
 ```
  
 #### BT19
  
 ```{r}
+toksBT19 <- contextBT19_clean
+toksBT19$party <- contextBT19$party
+
 set.seed(123)
-kmeansBT19 <- kmeans(distBT19_euclidean, k = 2, iter.max = 10, nstart = 2)
+kmeansBT19 <- kmeans(distBT19_euclidean, 2, iter.max = 10, nstart = 2)
 # Result
 kmeansBT19.image <-fviz_cluster(object = kmeansBT19, data = distBT19_euclidean,ellipse.type = "norm",
              geom = "point")
@@ -61,19 +76,24 @@ saveRDS(kmeansBT19, file = "kmeansBT19.RDS")
 saveRDS(kmeansBT19.image, file = "kmeansBT19.image.RDS")
 
 #Label asignment
-dfBT19$cluster <- kmeansBT19$cluster
-dfKmeansLinke <- dfBT19[dfBT19$party == "DIE LINKE.",] 
+toksBT19$cluster <- kmeansBT19$cluster
+dfKmeansLinke <- toksBT19[toksBT19$party == "DIE LINKE.",] 
 prop.table(table(dfKmeansLinke$cluster))
-dfKmeansAfD <- dfBT19[dfBT19$party == "AfD",] 
+dfKmeansAfD <- toksBT19[toksBT19$party == "AfD",] 
 prop.table(table(dfKmeansAfD$cluster))
-dfBT19$cluster[dfBT19$cluster == 2] <- 0 # cluster one is populism
+contextBT19$cluster <- toksBT19$cluster - 1 # cluster two is populism
+
+
 ```
  
 #### BT20
 
 ```{r}
+toksBT20 <- contextBT20_clean
+toksBT20$party <- contextBT20$party
+
 set.seed(123)
-kmeansBT20 <- kmeans(distBT20_euclidean, k = 2, iter.max = 10, nstart = 2)
+kmeansBT20 <- kmeans(distBT20_euclidean, 2, iter.max = 10, nstart = 2)
 # Result
 kmeansBT20.image <-fviz_cluster(object = kmeansBT20, data = distBT20_euclidean,ellipse.type = "norm",
              geom = "point")
@@ -82,12 +102,12 @@ saveRDS(kmeansBT20, file = "kmeansBT20.RDS")
 saveRDS(kmeansBT20.image, file = "kmeansBT20.image.RDS")
 
 # Label asignment
-dfBT20$cluster <- kmeansBT20$cluster
-dfKmeansLinke <- dfBT20[dfBT20$party == "DIE LINKE.",] 
+toksBT20$cluster <- kmeansBT20$cluster
+dfKmeansLinke <- toksBT20[toksBT20$party == "DIE LINKE.",] 
 prop.table(table(dfKmeansLinke$cluster))
-dfKmeansAfD <- dfBT20[dfBT20$party == "AfD",] 
+dfKmeansAfD <- toksBT20[toksBT20$party == "AfD",] 
 prop.table(table(dfKmeansAfD$cluster))
-dfBT20$cluster <- dfBT20$cluster - 1 # cluster two is populisms
+contextBT20$cluster  <- toksBT20$cluster - 1  # cluster two is populism
 ```
  
  
@@ -95,7 +115,7 @@ dfBT20$cluster <- dfBT20$cluster - 1 # cluster two is populisms
 #### Merge
  
 ```{r}
-dfKmeans <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20) 
+dfKmeans <-  rbind(contextBT17,contextBT18,contextBT19,contextBT20) 
 dfKmeans <- aggregate(dfKmeans$cluster, by = list(dfKmeans$pattern), FUN = "mean")
 colnames(dfKmeans) <- c("pattern","weight")
 dfKmeans$pattern <- make_patterns_compound(dfKmeans$pattern) #for merging later
@@ -105,19 +125,7 @@ saveRDS(dfKmeans, file = "dfKmeans.RDS")
  
 ```
  
- 
 
-#### Merge
- 
-
-```{r}
-dfKmeans <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20) 
-dfKmeans <- aggregate(dfKmeans$cluster, by = list(dfKmeans$pattern), FUN = "mean")
-colnames(dfKmeans) <- c("pattern","weight")
-dfKmeans$pattern <- make_patterns_compound(dfKmeans$pattern) #for merging later
-
- 
-```
  
  
 
@@ -160,14 +168,14 @@ save(kmeansBT17K, file = "dfKmeansBT17K.RDS")
 save(kmeansBT17K.image, file = "kmeansBT17K.image.RDS")
 
 # Cluster label asignment
-dfBT17$cluster.kmeans.trueK <- kmeansBT17K$cluster
-dfKmeansKLinke <- dfBT17[dfBT17$party == "DIE LINKE.",] 
+toksBT17$cluster.kmeans.trueK <- kmeansBT17K$cluster
+dfKmeansKLinke <- toksBT17[toksBT17$party == "DIE LINKE.",] 
 prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
 
-dfBT17$cluster.kmeans.trueK[dfBT17$cluster.kmeans.trueK == 1] <- 0
-dfBT17$cluster.kmeans.trueK[dfBT17$cluster.kmeans.trueK == 2] <- 1
-dfBT17$cluster.kmeans.trueK[dfBT17$cluster.kmeans.trueK == 3] <- 0
-dfBT17$cluster.kmeans.trueK[dfBT17$cluster.kmeans.trueK == 4] <- 1
+toksBT17$cluster.kmeans.trueK[toksBT17$cluster.kmeans.trueK == 1] <- 0
+toksBT17$cluster.kmeans.trueK[toksBT17$cluster.kmeans.trueK == 2] <- 1
+toksBT17$cluster.kmeans.trueK[toksBT17$cluster.kmeans.trueK == 3] <- 0
+toksBT17$cluster.kmeans.trueK[toksBT17$cluster.kmeans.trueK == 4] <- 1
 ```
 
 
@@ -189,14 +197,14 @@ save(kmeansBT18K, file = "dfKmeansBT18K.RDS")
 save(kmeansBT18K.image, file = "kmeansBT18K.image.RDS")
 
 # Cluster label asignment
-dfBT18$cluster.kmeans.trueK <- kmeansBT18K$cluster
-dfKmeansKLinke <- dfBT18[dfBT18$party == "DIE LINKE.",] 
+toksBT18$cluster.kmeans.trueK <- kmeansBT18K$cluster
+dfKmeansKLinke <- toksBT18[toksBT18$party == "DIE LINKE.",] 
 prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
 
 
-dfBT18$cluster.kmeans.trueK[dfBT18$cluster.kmeans.trueK == 2] <- 0
-dfBT18$cluster.kmeans.trueK[dfBT18$cluster.kmeans.trueK == 3] <- 0
-dfBT18$cluster.kmeans.trueK[dfBT18$cluster.kmeans.trueK == 4] <- 1
+toksBT18$cluster.kmeans.trueK[toksBT18$cluster.kmeans.trueK == 2] <- 0
+toksBT18$cluster.kmeans.trueK[toksBT18$cluster.kmeans.trueK == 3] <- 0
+toksBT18$cluster.kmeans.trueK[toksBT18$cluster.kmeans.trueK == 4] <- 1
 ```
 
 
@@ -218,16 +226,16 @@ save(kmeansBT19K, file = "dfKmeansBT19K.RDS")
 save(kmeansBT19K.image, file = "kmeansBT19K.image.RDS")
 
 # Cluster label asignment
-dfBT19$cluster.kmeans.trueK <- kmeansBT19K$cluster
-dfKmeansKLinke <- dfBT19[dfBT19$party == "DIE LINKE.",] 
+toksBT19$cluster.kmeans.trueK <- kmeansBT19K$cluster
+dfKmeansKLinke <- toksBT19[toksBT19$party == "DIE LINKE.",] 
 prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
-dfKmeansKAfD <- dfBT19[dfBT19$party == "AfD",] 
+dfKmeansKAfD <- toksBT19[toksBT19$party == "AfD",] 
 prop.table(table(dfKmeansKAfD$cluster.kmeans.trueK))
 
-dfBT19$cluster.kmeans.trueK[dfBT19$cluster.kmeans.trueK == 1] <- 0
-dfBT19$cluster.kmeans.trueK[dfBT19$cluster.kmeans.trueK == 2] <- 0
-dfBT19$cluster.kmeans.trueK[dfBT19$cluster.kmeans.trueK == 3] <- 0
-dfBT19$cluster.kmeans.trueK[dfBT19$cluster.kmeans.trueK == 4] <- 1
+toksBT19$cluster.kmeans.trueK[toksBT19$cluster.kmeans.trueK == 1] <- 0
+toksBT19$cluster.kmeans.trueK[toksBT19$cluster.kmeans.trueK == 2] <- 0
+toksBT19$cluster.kmeans.trueK[toksBT19$cluster.kmeans.trueK == 3] <- 0
+toksBT19$cluster.kmeans.trueK[toksBT19$cluster.kmeans.trueK == 4] <- 1
 
 ```
 
@@ -251,23 +259,23 @@ save(kmeansBT20K.image, file = "kmeansBT20K.image.RDS")
 
 
 # Cluster label asignment
-dfBT20$cluster.kmeans.trueK <- kmeansBT20K$cluster
-dfKmeansKLinke <- dfBT20[dfBT20$party == "DIE LINKE.",] 
+toksBT20$cluster.kmeans.trueK <- kmeansBT20K$cluster
+dfKmeansKLinke <- toksBT20[toksBT20$party == "DIE LINKE.",] 
 prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
-dfKmeansKAfD <- dfBT20[dfBT20$party == "AfD",] 
+dfKmeansKAfD <- toksBT20[toksBT20$party == "AfD",] 
 prop.table(table(dfKmeansKAfD$cluster.kmeans.trueK))
 
-dfBT20$cluster.kmeans.trueK[dfBT20$cluster.kmeans.trueK == 1] <- 0
-dfBT20$cluster.kmeans.trueK[dfBT20$cluster.kmeans.trueK == 2] <- 0
-dfBT20$cluster.kmeans.trueK[dfBT20$cluster.kmeans.trueK == 3] <- 1
-dfBT20$cluster.kmeans.trueK[dfBT20$cluster.kmeans.trueK == 4] <- 0
+toksBT20$cluster.kmeans.trueK[toksBT20$cluster.kmeans.trueK == 1] <- 0
+toksBT20$cluster.kmeans.trueK[toksBT20$cluster.kmeans.trueK == 2] <- 0
+toksBT20$cluster.kmeans.trueK[toksBT20$cluster.kmeans.trueK == 3] <- 1
+toksBT20$cluster.kmeans.trueK[toksBT20$cluster.kmeans.trueK == 4] <- 0
 
 ```
 
 
 ### Merge
 ```{r}
-dfKmeansK <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20) 
+dfKmeansK <-  rbind(toksBT17,toksBT18,toksBT19,toksBT20) 
 dfKmeansK <- aggregate(dfKmeansK$cluster, by = list(dfKmeansK$pattern), FUN = "mean")
 colnames(dfKmeansK) <- c("pattern","weight")
 dfKmeansK$pattern <- make_patterns_compound(dfKmeansK$pattern) #for merging later
