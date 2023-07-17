@@ -1,0 +1,31 @@
+---
+title: "3.5 Statistiken gewichteter Diktionäre"
+author: "Tom Klotz"
+date: "9 7 2023"
+output: html_document
+---
+
+
+### General
+
+
+```{r}
+
+corpBT17_20 <- corpus(BT17_20, text_field = "speech_content")
+
+statsBT17_20 <- multidictR::get_pattern_stats(corpBT17_20, patterns = popdictR::gruendl_terms)
+
+minstatsBT17_20 <- statsBT17_20[statsBT17_20$match_count < 10 & statsBT17_20$match_count != 0,]
+
+```
+
+#############
+## Kmeans Diktionär
+#############
+
+```{r}
+table(dfKmeans$weight)
+
+
+```
+
