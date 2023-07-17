@@ -78,13 +78,11 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 
 validation2014 <- merge(result2014, exp2014)
 
-correlation2014P <- list()
 correlation2014 <- list()
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
-    correlation <- cor.test(x = validation2014[[i]], y = validation2014$expert_rating, method = "pearson")
-    correlation2014P[[i]] <- correlation$p.value
-    correlation2014[[i]] <- correlation$estimate
+    correlation <- cor(x = validation2014[[i]], y = validation2014$expert_rating, method = "pearson")
+    correlation2014[[i]] <- correlation 
 }
 
 
@@ -167,13 +165,11 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 
 validation2017 <- merge(result2017, exp2017)
 
-correlation2017P <- list()
 correlation2017 <- list()
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
-    correlation <- cor.test(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
-    correlation2017P[[i]] <- correlation$p.value
-    correlation2017[[i]] <- correlation$estimate
+    correlation <- cor(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
+    correlation2017[[i]] <- correlation 
 }
 
 
@@ -306,70 +302,6 @@ gtValidation <- gt(dfValidation,rowname_col = "Jahre") %>%
    title = "Tabelle 1: Dictionaries im Vergleich ",
    subtitle = "Zusammenhang zwischen Dictionaries und Expertenbefragungen nach Jahren") #%>%
    #gtsave("gtValidation.tex")
-```
-
-##############################
-## deskriptive Inferenz
-##############################
-
-```{r}
-
-result2014 <- result2014Clara %>%
-  select(party, gruendl, n_sentences)%>%
-  rename("2014" = gruendl)
-result2014$party[result2014$party == "DIE LINKE."] <- "LINKE"
-
-result2014$'2014' <- round(result2014$'2014'/result2014$n_sentences * 100, digits = 2)
-result2014$n_sentences <- NULL
-result2014[nrow(result2014) + 1,] <- list("AfD", NA,NA)
-result2014[nrow(result2014) + 1,] <- list("FDP", NA,NA)
-
-
-
-
-### 2017 -----------------------------------------------------------------------
-result2017 <- result2017Clara %>%
-  select(party, gruendl, n_sentences)%>%
-  rename("2017" = gruendl)
-result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
-
-result2017$'2017' <- round(result2017$'2017'/result2017$n_sentences * 100, digits = 2)
-result2017$n_sentences <- NULL
-
-### 2019 -----------------------------------------------------------------------
-result2019 <- result2019Clara %>%
-  select(party, gruendl, n_sentences) %>%
-  rename("2019" = gruendl)
-
-result2019$party[result2019$party == "DIE LINKE."] <- "LINKE"
-result2019$party[result2019$party == "Fraktionslos"] <- NA
-result2019 <- na.omit(result2019)
-
-result2019$'2019' <- round(result2019$'2019'/result2019$n_sentences * 100, digits = 2)
-result2019$n_sentences <- NULL
-
-
-#result <- bind_cols(result2014, select(result2017,'2017'),select(result2019,'2019'))
-#result <- merge(result2014, merge(select(result2017,'2017',n_sentences),select(result2019,'2019',n_sentences)))
-result <- merge(result2014, merge(result2017, result2019))
-
-
-
-### Tabelle --------------------------------------------------------------------
-
-gt(result,rowname_col = "party") %>%  
-  tab_header(
-   title = "Tabelle 2: Populistische Saetze in Bundestagsreden nach Parteien"
-  ) %>%
-  tab_spanner(
-    label = "Prozentanteil populistischer Saetze",
-    columns = c('2014','2017', '2019')) %>%
-  #cols_move_to_start("PopuList") %>%
-  tab_stubhead(label = "Fraktionen") #%>%
-  #gtsave("2014.tex")
-
-
-
 ```
 
 

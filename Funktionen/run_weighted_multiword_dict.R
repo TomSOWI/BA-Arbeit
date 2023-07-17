@@ -6,14 +6,14 @@
 
 
 run_weighted_multiword_dict <- function(
-  data,
-  dict_compound,
-  dict_name = "original",
-  dict_weight,
-  dict_weight_name = "weighted",
-  prepare_corp = FALSE,
-  include_main_dict = TRUE,
-  include_totals = TRUE
+    data,
+    dict_compound,
+    dict_name = "original",
+    dict_weight,
+    dict_weight_name = "weighted",
+    prepare_corp = FALSE,
+    include_main_dict = TRUE,
+    include_totals = TRUE
 )
 {
   if (prepare_corp == TRUE) {
@@ -72,5 +72,4 @@ run_weighted_multiword_dict <- function(
   
   return(result)
 }
-
 
