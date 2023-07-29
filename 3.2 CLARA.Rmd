@@ -18,6 +18,8 @@ output: html_document
 
 
 ```{r}
+toksBT17 <- contextBT17_clean
+toksBT17$party <- contextBT17$party
 # BT17
 set.seed(123)
 claraBT17 <- clara(distBT17_euclidean, k = 2, samples = 50, pamLike = TRUE)
@@ -29,14 +31,16 @@ saveRDS(claraBT17, file = "claraBT17.RDS")
 saveRDS(claraBT17.image, file = "claraBT17.image.RDS")
 
 # Cluster label asignment
-dfBT17$cluster.clara <- claraBT17$clustering
-dfClaraLinke <- dfBT17[dfBT17$party == "DIE LINKE.",] 
-prop.table(table(dfClaraLinke$cluster))
-dfBT17$cluster.clara  <- dfBT17$cluster.clara.  - 1 # cluster two is populism
+toksBT17$cluster.clara <- claraBT17$clustering
+dfClaraLinke <- toksBT17[toksBT17$party == "DIE LINKE.",] 
+prop.table(table(dfClaraLinke$cluster.clara))
+contextBT17$cluster.clara  <- toksBT17$cluster.clara  - 1 # cluster two is populism
 ```
 
 
 ```{r}
+toksBT18 <- contextBT18_clean
+toksBT18$party <- contextBT18$party
 # BT18
 
 set.seed(123)
@@ -49,38 +53,44 @@ saveRDS(claraBT18, file = "claraBT18.RDS")
 saveRDS(claraBT18.image, file = "claraBT18.image.RDS")
 
 # Cluster label asignment
-dfBT18$cluster.clara <- claraBT18$clustering
-dfClaraLinke <- dfBT18[dfBT18$party == "DIE LINKE.",] 
-prop.table(table(dfClaraLinke$cluster)) # 47 vs 57
-dfBT18$cluster.clara.  <- dfBT18$cluster.clara  - 1 # cluster two is populism
+toksBT18$cluster.clara <- claraBT18$clustering
+dfClaraLinke <- toksBT18[toksBT18$party == "DIE LINKE.",] 
+prop.table(table(dfClaraLinke$cluster.clara)) 
+toksBT18$cluster.clara[toksBT18$cluster.clara == 2] <- 0 # cluster one is populism
+contextBT18$cluster.clara <- toksBT18$cluster.clara
 ```
 
 
 ```{r}
+toksBT19 <- contextBT19_clean
+toksBT19$party <- contextBT19$party
 # BT19
 set.seed(123)
 claraBT19 <- clara(distBT19_euclidean, k = 2, samples = 50, pamLike = TRUE)
 # Result
-claraBT19Jaccrad.image <-fviz_cluster(object = claraBT19, data = distBT19_euclidean, ellipse.type = "norm",
+claraBT19.image <-fviz_cluster(object = claraBT19, data = distBT19_euclidean, ellipse.type = "norm",
              geom = "point")
 
 saveRDS(claraBT19, file = "claraBT19.RDS")
 saveRDS(claraBT19.image, file = "claraBT19.image.RDS")
 
 # Cluster label asignment
-dfBT19$cluster.clara <- claraBT19$clustering
-dfClaraLinke <- dfBT19[dfBT19$party == "DIE LINKE.",] 
-prop.table(table(dfClaraLinke$cluster))
-dfClaraAfD <- dfBT19[dfBT19$party == "AfD",] 
-prop.table(table(dfClaraAfD$cluster))
-dfBT19$cluster.clara.[dfBT19$cluster.clara == 2] <- 0 # cluster one is populism
+toksBT19$cluster.clara <- claraBT19$clustering
+dfClaraLinke <- toksBT19[toksBT19$party == "DIE LINKE.",] 
+prop.table(table(dfClaraLinke$cluster.clara))
+dfClaraAfD <- toksBT19[toksBT19$party == "AfD",] 
+prop.table(table(dfClaraAfD$cluster.clara))
+toksBT19$cluster.clara[toksBT19$cluster.clara == 2] <- 0 # cluster one is populism
+contextBT19$cluster.clara <- toksBT19$cluster.clara
 ```
 
 
 ```{r}
+toksBT20 <- contextBT20_clean
+toksBT20$party <- contextBT20$party
 # BT20
 set.seed(123)
-claraBT20 <- clara(distBT20_euclidean,, k = 2, samples = 50, pamLike = TRUE)
+claraBT20 <- clara(distBT20_euclidean, k = 2, samples = 50, pamLike = TRUE)
 #Result
 claraBT20.image <-fviz_cluster(object = claraBT20, data = distBT20_euclidean, ellipse.type = "norm",
              geom = "point")
@@ -89,19 +99,20 @@ saveRDS(claraBT20, file = "claraBT20.RDS")
 saveRDS(claraBT20.image, file = "claraBT20.image.RDS")
 
 # Cluster label asignment
-dfBT20$cluster.clara <- claraBT20$clustering
-dfClaraLinke <- dfBT20[dfBT20$party == "DIE LINKE.",] 
-prop.table(table(dfClaraLinke$cluster))
-dfClaraAfD <- dfBT20[dfBT20$party == "AfD",] 
-prop.table(table(dfClaraAfD$cluster)) 
-dfBT20$cluster.clara.[dfBT20$cluster.clara == 2] <- 0 # cluster one is populism
+toksBT20$cluster.clara <- claraBT20$clustering
+dfClaraLinke <- toksBT20[toksBT20$party == "DIE LINKE.",] 
+prop.table(table(dfClaraLinke$cluster.clara))
+dfClaraAfD <- toksBT20[toksBT20$party == "AfD",] 
+prop.table(table(dfClaraAfD$cluster.clara)) 
+toksBT20$cluster.clara[toksBT20$cluster.clara == 2] <- 0 # cluster one is populism
+contextBT20$cluster.clara <- toksBT20$cluster.clara
 ```
 
 ### Merge
 
 ```{r}
 
-dfClara <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20)
+dfClara <-  rbind(contextBT17,contextBT18,contextBT19,contextBT20)
 dfClara <- aggregate(dfClara$cluster, by = list(dfClara$pattern), FUN = "mean")
 colnames(dfClara) <- c("pattern","weight")
 dfClara$pattern <- make_patterns_compound(dfClara$pattern) #for merging lat
@@ -119,14 +130,18 @@ saveRDS(dfClara, file = "dfClara.RDS")
 
 
 ```{r}
+toksBT20 <- contextBT20_clean
+toksBT20$party <- contextBT20$party
 # BT20
 set.seed(123)
 claraBT20TrueK <- fviz_nbclust(as.matrix(distBT20_euclidean), clara, method = "wss") +    
-  geom_vline(xintercept = 4, linetype = 2)+
+  geom_vline(xintercept = 6, linetype = 2)+
   labs(subtitle = "Elbow method")
 
+truth.k = 6
 
-claraBT20K <- clara(distBT20_, truth.K, samples = 50, pamLike = TRUE)
+
+claraBT20K <- clara(distBT20_euclidean, truth.k, samples = 50, pamLike = TRUE)
 
 claraBT20K.image <-fviz_cluster(object = claraBT20K, data = distBT20_euclidean,ellipse.type = "norm",
              geom = "point")
@@ -135,26 +150,30 @@ saveRDS(claraBT20K, file = "claraBT20K.RDS")
 saveRDS(claraBT20K.image, file = "claraBT20K.image.RDS")
 
 # Cluster label asignment
-dfBT20$cluster.clara.truek <- claraBT20K$clustering
-dfClaraKLinke <- dfBT20[dfBT20$party == "DIE LINKE.",] 
-prop.table(table(dfClaraKLinke$cluster))
-dfClaraKAfD <- dfBT20[dfBT20$party == "AfD",] 
-prop.table(table(dfClaraKAfD$cluster)) 
+toksBT20$cluster.clara.truek <- claraBT20K$clustering
+dfClaraKLinke <- toksBT20[toksBT20$party == "DIE LINKE.",] 
+prop.table(table(dfClaraKLinke$cluster.clara.truek))
+dfClaraKAfD <- toksBT20[toksBT20$party == "AfD",] 
+prop.table(table(dfClaraKAfD$cluster.clara.truek)) 
 
-dfBT20$cluster.clara.truek[dfBT20$cluster.clara.truek == 2] <- 1
-dfBT20$cluster.clara.truek[dfBT20$cluster.clara.truek == 3] <- 1
-dfBT20$cluster.clara.truek[dfBT20$cluster.clara.truek == 1] <- 0
-dfBT20$cluster.clara.truek[dfBT20$cluster.clara.truek == 4] <- 0
+toksBT20$cluster.clara.truek[toksBT20$cluster.clara.truek == 1] <- 1
+toksBT20$cluster.clara.truek[toksBT20$cluster.clara.truek == 2] <- 0
+toksBT20$cluster.clara.truek[toksBT20$cluster.clara.truek == 3] <- 0
+toksBT20$cluster.clara.truek[toksBT20$cluster.clara.truek == 4] <- 0
+toksBT20$cluster.clara.truek[toksBT20$cluster.clara.truek == 5] <- 1
+toksBT20$cluster.clara.truek[toksBT20$cluster.clara.truek == 6] <- 1
+
+contextBT20$cluster.clara.truek <- toksBT20$cluster.clara.truek
 ```
 
 ```{r}
 # BT19
 set.seed(123)
 claraBT19TrueK <- fviz_nbclust(as.matrix(distBT19_euclidean), clara, method = "wss") +    
-  geom_vline(xintercept = 4, linetype = 2)+
+  geom_vline(xintercept = 5, linetype = 2)+
   labs(subtitle = "Elbow method")
 
-truth.K = 4 
+truth.K = 5 
 
 claraBT19K <- clara(distBT19_euclidean, truth.K, samples = 50, pamLike = TRUE)
 
@@ -165,27 +184,32 @@ saveRDS(claraBT19K, file = "claraBT19K.RDS")
 saveRDS(claraBT19K.image, file = "claraBT19K.image.RDS")
 
 # Cluster label asignment
-dfBT19$cluster.clara.truek <- claraBT19K$clustering
-dfClaraKLinke <- dfBT19[dfBT19$party == "DIE LINKE.",] 
-prop.table(table(dfClaraKLinke$cluster))
-dfClaraKAfD <- dfBT19[dfBT19$party == "AfD",] 
-prop.table(table(dfClaraKAfD$cluster))
+toksBT19$cluster.clara.truek <- claraBT19K$clustering
+dfClaraKLinke <- toksBT19[toksBT19$party == "DIE LINKE.",] 
+prop.table(table(dfClaraKLinke$cluster.clara.truek))
+dfClaraKAfD <- toksBT19[toksBT19$party == "AfD",] 
+prop.table(table(dfClaraKAfD$cluster.clara.truek))
 
-dfBT19$cluster.clara.truek[dfBT19$cluster.clara.truek == 2] <- 0
-dfBT19$cluster.clara.truek[dfBT19$cluster.clara.truek == 3] <- 0
-dfBT19$cluster.clara.truek[dfBT19$cluster.clara.truek == 4] <- 0
+toksBT19$cluster.clara.truek[toksBT19$cluster.clara.truek == 1] <- 1
+toksBT19$cluster.clara.truek[toksBT19$cluster.clara.truek == 2] <- 0
+toksBT19$cluster.clara.truek[toksBT19$cluster.clara.truek == 3] <- 1
+toksBT19$cluster.clara.truek[toksBT19$cluster.clara.truek == 4] <- 0
+toksBT19$cluster.clara.truek[toksBT19$cluster.clara.truek == 5] <- 0
+
+contextBT19$cluster.clara.truek <- toksBT19$cluster.clara.truek
+
 ```
 
 ```{r}
 # BT18
 set.seed(123)
 claraBT18TrueK <- fviz_nbclust(as.matrix(distBT18_euclidean), clara, method = "wss") +    
-  geom_vline(xintercept = 4, linetype = 2)+
+  geom_vline(xintercept = 6, linetype = 2)+
   labs(subtitle = "Elbow method")
 
-truth.K = 4 
+truth.k = 6 
 
-claraBT18K <- clara(distBT18_, truth.K, samples = 50, pamLike = TRUE)
+claraBT18K <- clara(distBT18_euclidean, truth.k, samples = 50, pamLike = TRUE)
 
 claraBT18K.image <-fviz_cluster(object = claraBT18K, data = distBT18_euclidean,ellipse.type = "norm",
              geom = "point")
@@ -194,28 +218,32 @@ saveRDS(claraBT18K, file = "claraBT18K.RDS")
 saveRDS(claraBT18K.image, file = "claraBT18K.image.RDS")
 
 # Cluster label asignment
-dfBT18$cluster.clara.truek <- claraBT18K$clustering
-dfClaraKLinke <- dfBT18[dfBT18$party == "DIE LINKE.",] 
-prop.table(table(dfClaraKLinke$cluster))
+toksBT18$cluster.clara.truek <- claraBT18K$clustering
+dfClaraKLinke <- toksBT18[toksBT18$party == "DIE LINKE.",] 
+prop.table(table(dfClaraKLinke$cluster.clara.truek))
 
-dfBT18$cluster.clara.truek[dfBT18$cluster.clara.truek == 2] <- 1
-dfBT18$cluster.clara.truek[dfBT18$cluster.clara.truek == 3] <- 0
-dfBT18$cluster.clara.truek[dfBT18$cluster.clara.truek == 4] <- 0
+toksBT18$cluster.clara.truek[toksBT18$cluster.clara.truek == 1] <- 1
+toksBT18$cluster.clara.truek[toksBT18$cluster.clara.truek == 2] <- 1
+toksBT18$cluster.clara.truek[toksBT18$cluster.clara.truek == 3] <- 0
+toksBT18$cluster.clara.truek[toksBT18$cluster.clara.truek == 4] <- 0
+toksBT18$cluster.clara.truek[toksBT18$cluster.clara.truek == 5] <- 0
+toksBT18$cluster.clara.truek[toksBT18$cluster.clara.truek == 6] <- 0
 
-
-
+contextBT18$cluster.clara.truek <- toksBT18$cluster.clara.truek
 ```
 
 ```{r}
+toksBT17 <- contextBT17_clean
+toksBT17$party <- contextBT17$party
 # BT 17
 set.seed(123)
 claraBT17TrueK <- fviz_nbclust(as.matrix(distBT17_euclidean), clara, method = "wss") +    
-  geom_vline(xintercept = 4, linetype = 2)+
+  geom_vline(xintercept = 6, linetype = 2)+
   labs(subtitle = "Elbow method")
 
-truth.K = 4 
+truth.k = 6 
 
-claraBT17K <- clara(distBT17_, samples = 50, pamLike = TRUE)
+claraBT17K <- clara(distBT17_euclidean, truth.k,samples = 50, pamLike = TRUE)
 
 claraBT17K.image <-fviz_cluster(object = claraBT17K, data = distBT17_euclidean,ellipse.type = "norm",
              geom = "point")
@@ -224,24 +252,30 @@ saveRDS(claraBT17K, file = "claraBT17K.RDS")
 saveRDS(claraBT17K.image, file = "claraBT17K.image.RDS")
 
 # Cluster label asignment
-dfBT17$cluster.clara.truek <- claraBT17K$clustering
-dfClaraKLinke <- dfBT17[dfBT17$party == "DIE LINKE.",] 
-prop.table(table(dfClaraKLinke$cluster))
+toksBT17$cluster.clara.truek <- claraBT17K$clustering
+dfClaraKLinke <- toksBT17[toksBT17$party == "DIE LINKE.",] 
+prop.table(table(dfClaraKLinke$cluster.clara.truek))
 
-dfBT17$cluster.clara.truek[dfBT17$cluster.clara.truek == 1] <- 0
-dfBT17$cluster.clara.truek[dfBT17$cluster.clara.truek == 2] <- 1
-dfBT17$cluster.clara.truek[dfBT17$cluster.clara.truek == 3] <- 0
-dfBT17$cluster.clara.truek[dfBT17$cluster.clara.truek == 4] <- 0
+toksBT17$cluster.clara.truek[toksBT17$cluster.clara.truek == 1] <- 0
+toksBT17$cluster.clara.truek[toksBT17$cluster.clara.truek == 2] <- 0
+toksBT17$cluster.clara.truek[toksBT17$cluster.clara.truek == 3] <- 1
+toksBT17$cluster.clara.truek[toksBT17$cluster.clara.truek == 4] <- 0
+toksBT17$cluster.clara.truek[toksBT17$cluster.clara.truek == 5] <- 0
+toksBT17$cluster.clara.truek[toksBT17$cluster.clara.truek == 6] <- 1
+
+contextBT17$cluster.clara.truek <- toksBT17$cluster.clara.truek
 
 ```
 
 ### Merge
 
 ```{r}
-dfClaraK <-  rbind(dfBT17,dfBT18,dfBT19,dfBT20)
-dfClaraK <- aggregate(dfClaraK$cluster, by = list(dfClaraK$pattern), FUN = "mean")
+dfClaraK <-  rbind(contextBT17,contextBT18,contextBT19,contextBT20)
+dfClaraK <- aggregate(dfClaraK$cluster.clara.truek, by = list(dfClaraK$pattern), FUN = "mean")
 colnames(dfClaraK) <- c("pattern","weight")
 dfClaraK$pattern <- make_patterns_compound(dfClaraK$pattern) #for merging lat
 saveRDS(dfClaraK, file = "dfClaraK.RDS")
+
+
 ```
 

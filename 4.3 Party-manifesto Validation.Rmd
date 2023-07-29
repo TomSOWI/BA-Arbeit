@@ -40,7 +40,7 @@ for (h in term) {
 }
 term_ngram
 
-# "-" kann entfernt werden, da es keinen Effekt auf Pattern hat
+# "-" kann entfernt werden, da es keinen Effekt auf Patterns hat
 
 ```
 
@@ -82,7 +82,7 @@ corp_mp_clean <- gsub("[[:digit:]]", "", corp_mp_clean)
 
 #corp_mp_clean[[6]]
 
-corp_mp_clean[[9]]
+#corp_mp_clean[[9]]
 ```
 
 
@@ -111,6 +111,7 @@ mp2021 <- corp_mp_clean[corp_mp_clean$date == "2021",]
 
 ```{r}
 mp2013Clean <- corpus_to_compound_tokens(corp = mp2013, pattern = popdictR::gruendl_terms)
+saveRDS(mp2013Clean, file = "mp2013Clean.RDS")
 
 pattern <- gruendl_patterns_to_compound()
 
@@ -120,7 +121,7 @@ result2013Clara <- run_weighted_multiword_dict(
   data = mp2013Clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraJaccard,
+  dict_weight = dfClara,
   dict_weight_name = "clara",
   prepare_corp = FALSE,
   include_main_dict = TRUE,
@@ -132,7 +133,7 @@ result2013ClaraK <- run_weighted_multiword_dict(
   data = mp2013Clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraKJaccard,
+  dict_weight = dfClaraK,
   dict_weight_name = "claraK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -154,7 +155,7 @@ result2013KmeansK <- run_weighted_multiword_dict(
   data = mp2013Clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfKmeans,
+  dict_weight = dfKmeansK,
   dict_weight_name = "kmeansK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -171,14 +172,12 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
   result2013[[i]] <- scale(result2013[[i]], center = T)
 }
 result2013$party[result2013$party == "DIE LINKE."] <- "LINKE"
-validation2013 <- merge(result2013, exp_2014_afd)
+validation2013 <- merge(result2013, exp2014_afd)
 
-correlation2013P <- list()
 correlation2013 <- list()
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
     correlation <- cor.test(x = validation2013[[i]], y = validation2013$expert_rating, method = "pearson")
-    correlation2013P[[i]] <- correlation$p.value
     correlation2013[[i]] <- correlation$estimate
 }
 
@@ -192,7 +191,7 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 
 ```{r}
 mp2017Clean <- corpus_to_compound_tokens(corp = mp2017, pattern = popdictR::gruendl_terms)
-
+saveRDS(mp2017Clean, file = "mp2017Clean.RDS")
 
 pattern <- gruendl_patterns_to_compound()
 
@@ -200,7 +199,7 @@ result2017Clara <- run_weighted_multiword_dict(
   data = mp2017Clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraJaccard,
+  dict_weight = dfClara,
   dict_weight_name = "clara",
   prepare_corp = FALSE,
   include_main_dict = TRUE,
@@ -212,7 +211,7 @@ result2017ClaraK <- run_weighted_multiword_dict(
   data = mp2017Clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraKJaccard,
+  dict_weight = dfClaraK,
   dict_weight_name = "claraK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -234,7 +233,7 @@ result2017KmeansK <- run_weighted_multiword_dict(
   data = mp2017Clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfKmeans,
+  dict_weight = dfKmeansK,
   dict_weight_name = "kmeansK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -253,12 +252,10 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
 validation2017 <- merge(result2017, exp2017)
 
-correlation2017P <- list()
 correlation2017 <- list()
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
     correlation <- cor.test(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
-    correlation2017P[[i]] <- correlation$p.value
     correlation2017[[i]] <- correlation$estimate
 }
 
@@ -272,13 +269,13 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 
 ```{r}
 mp2021Clean <- corpus_to_compound_tokens(corp = mp2021, pattern = popdictR::gruendl_terms)
-
+saveRDS(mp2021Clean, file = "mp2021Clean.RDS")
 
 result2021Clara <- run_weighted_multiword_dict(
   data = mp2021Clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraJaccard,
+  dict_weight = dfClara,
   dict_weight_name = "clara",
   prepare_corp = FALSE,
   include_main_dict = TRUE,
@@ -290,7 +287,7 @@ result2021ClaraK <- run_weighted_multiword_dict(
   data = mp2021Clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraKJaccard,
+  dict_weight = dfClaraK,
   dict_weight_name = "claraK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -312,7 +309,7 @@ result2021KmeansK <- run_weighted_multiword_dict(
   data = mp2021Clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfKmeans,
+  dict_weight = dfKmeansK,
   dict_weight_name = "kmeansK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -331,14 +328,13 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 result2021$party[result2021$party == "DIE LINKE."] <- "LINKE"
 validation2021 <- merge(result2021, exp2019)
 
-correlation2021P <- list()
 correlation2021 <- list()
 
 for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
-    correlation <- cor(x = validation2021[[i]], y = validation2021$expert_rating, method = "pearson")
-    correlation2021P[[i]] <- correlation$p.value
+    correlation <- cor.test(x = validation2021[[i]], y = validation2021$expert_rating, method = "pearson")
     correlation2021[[i]] <- correlation$estimate
 }
+
 
 ```
 
@@ -378,8 +374,8 @@ dfValidation <- data.frame(Jahr,gruendl,clara,claraK,kmeans,kmeansK)
 gtValidation <- gt(dfValidation,rowname_col = "Jahre") %>%  
   tab_header(
    title = "Tabelle 1: Dictionaries im Vergleich ",
-   subtitle = "Zusammenhang zwischen Dictionaries und Expertenbefragungen nach Jahren") #%>%
-   #gtsave("gtValidation.tex")
+   subtitle = "Zusammenhang zwischen Dictionaries und Expertenbefragungen nach Jahren") %>%
+   gtsave("ValidationMP.tex")
 ```
 
 ##############################
@@ -393,7 +389,7 @@ result2013 <- result2013Clara %>%
   rename("2013" = gruendl)
 result2013$party[result2013$party == "DIE LINKE."] <- "LINKE"
 
-result2013$'2013' <- round(result2013$'2013'/result2013$n_sentences * 100, digits = 3)
+result2013$'2013' <- round(result2013$'2013'/result2013$n_sentences * 100, digits = 2)
 result2013$n_sentences <- NULL
 #result2013[nrow(result2013) + 1,] <- list("AfD", NA,NA)
 #result2013[nrow(result2013) + 1,] <- list("FDP", NA,NA)
@@ -407,7 +403,7 @@ result2017 <- result2017Clara %>%
   rename("2017" = gruendl)
 result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
 
-result2017$'2017' <- round(result2017$'2017'/result2017$n_sentences * 100, digits = 3)
+result2017$'2017' <- round(result2017$'2017'/result2017$n_sentences * 100, digits = 2)
 result2017$n_sentences <- NULL
 
 ### 2021 -----------------------------------------------------------------------
@@ -419,7 +415,7 @@ result2021$party[result2021$party == "DIE LINKE."] <- "LINKE"
 result2021$party[result2021$party == "Fraktionslos"] <- NA
 result2021 <- na.omit(result2021)
 
-result2021$'2021' <- round(result2021$'2021'/result2021$n_sentences * 100, digits = 3)
+result2021$'2021' <- round(result2021$'2021'/result2021$n_sentences * 100, digits = 2)
 result2021$n_sentences <- NULL
 
 
@@ -439,17 +435,116 @@ gt(result,rowname_col = "party") %>%
     label = "Prozentanteil populistischer Saetze",
     columns = c('2013','2017', '2021')) %>%
   #cols_move_to_start("PopuList") %>%
-  tab_stubhead(label = "Fraktionen") #%>%
-  #gtsave("2013.tex")
+  tab_stubhead(label = "Fraktionen") %>%
+  gtsave("deskriptivMP.tex")
 
 
 
 ```
 
 
+#############################################################
+# Ohne Breinígung der Textlänge
+#############################################################
+
+```{r}
+###2013
+
+result2013 <- bind_cols(result2013Clara,select(result2013ClaraK, claraK),
+                        select(result2013Kmeans, kmeans), 
+                        select(result2013KmeansK, kmeansK))
+
+for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
+  result2013[[i]] <- result2013[[i]] 
+  result2013[[i]] <- scale(result2013[[i]], center = T)
+}
+result2013$party[result2013$party == "DIE LINKE."] <- "LINKE"
+validation2013 <- merge(result2013, exp2014)
+
+correlation2013 <- list()
+
+for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
+    correlation <- cor.test(x = validation2013[[i]], y = validation2013$expert_rating, method = "pearson")
+    correlation2013[[i]] <- correlation$estimate
+}
+
+### 2017
+
+result2017 <- bind_cols(result2017Clara,select(result2017ClaraK, claraK),
+                        select(result2017Kmeans, kmeans), 
+                        select(result2017KmeansK, kmeansK))
 
 
+for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
+  result2017[[i]] <- result2017[[i]] 
+  result2017[[i]] <- scale(result2017[[i]], center = T)
+}
+result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
+validation2017 <- merge(result2017, exp2017)
 
+correlation2017 <- list()
+
+for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
+    correlation <- cor.test(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
+    correlation2017[[i]] <- correlation$estimate
+}
+
+### 2021
+
+result2021 <- bind_cols(result2021Clara,select(result2021ClaraK, claraK),
+                        select(result2021Kmeans, kmeans), 
+                        select(result2021KmeansK, kmeansK))
+
+for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
+  result2021[[i]] <- result2021[[i]] 
+  result2021[[i]] <- scale(result2021[[i]], center = T)
+}
+result2021$party[result2021$party == "DIE LINKE."] <- "LINKE"
+validation2021 <- merge(result2021, exp2019)
+
+correlation2021 <- list()
+
+for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
+    correlation <- cor.test(x = validation2021[[i]], y = validation2021$expert_rating, method = "pearson")
+    correlation2021[[i]] <- correlation$estimate
+}
+
+```
+
+##############################
+## Konstruktvalidität
+##############################
+
+
+```{r}
+Jahr <- c(2013,2017,2021,"Durchschnitt")
+gruendl_mean <- (correlation2013$gruendl + correlation2017$gruendl + correlation2021$gruendl)/3
+gruendl <- round(c(correlation2013$gruendl, correlation2017$gruendl, correlation2021$gruendl, gruendl_mean), digits = 3)
+
+clara_mean <- (correlation2013$clara + correlation2017$clara + correlation2021$clara)/3
+clara <- round(c(correlation2013$clara, correlation2017$clara, correlation2021$clara, clara_mean), digits = 3)
+               
+               
+
+claraK_mean <- (correlation2013$claraK + correlation2017$claraK + correlation2021$claraK)/3
+claraK <- round(c(correlation2013$claraK, correlation2017$claraK, correlation2021$claraK, claraK_mean), digits = 3)
+
+kmeans_mean <- (correlation2013$kmeans + correlation2017$kmeans + correlation2021$kmeans)/3
+kmeans <- round(c(correlation2013$kmeans, correlation2017$kmeans, correlation2021$kmeans, kmeans_mean), digits = 3)
+
+kmeansK_mean <- (correlation2013$kmeansK + correlation2017$kmeansK + correlation2021$kmeansK)/3
+kmeansK <- round(c(correlation2013$kmeansK, correlation2017$kmeansK, correlation2021$kmeansK, kmeansK_mean), digits = 3)
+
+
+dfValidation <- data.frame(Jahr,gruendl,clara,claraK,kmeans,kmeansK)
+
+
+gtValidation <- gt(dfValidation,rowname_col = "Jahre") %>%  
+  tab_header(
+   title = "Tabelle 1: Dictionaries im Vergleich ",
+   subtitle = "Zusammenhang zwischen Dictionaries und Expertenbefragungen nach Jahren")# %>%
+   #gtsave("ValidationMP_abs.tex")
+```
 
 
 

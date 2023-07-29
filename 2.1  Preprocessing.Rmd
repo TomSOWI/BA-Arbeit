@@ -31,6 +31,7 @@ tokensBT17 <- corpus_to_compound_tokens(corpBT17, popdictR::gruendl_terms) #crea
 contextBT17 <- aggregate_context(tokensBT17, gruendl_patterns_to_underscore()) #create context vector 
 saveRDS(contextBT17, file = "contextBT17.RDS")
 contextBT17_clean <- clean_contextdata(contextBT17$context)
+saveRDS(contextBT17_clean, file = "contextBT17_clean.RDS")
 distBT17_euclidean <- distance_matrix(contextBT17_clean, method = "euclidean") 
 saveRDS(distBT17_euclidean, file = "distBT17_euclidean.RDS")
 
@@ -45,6 +46,7 @@ tokensBT18 <- corpus_to_compound_tokens(corpBT18, popdictR::gruendl_terms)
 contextBT18 <- aggregate_context(tokensBT18, gruendl_patterns_to_underscore())
 saveRDS(contextBT18, file = "contextBT18.RDS")
 contextBT18_clean <- clean_contextdata(contextBT18$context)
+saveRDS(contextBT18_clean, file = "contextBT18_clean.RDS")
 distBT18_euclidean <- distance_matrix(contextBT18_clean, method = "euclidean")
 saveRDS(distBT18_euclidean, file = "distBT18_euclidean.RDS")
 
@@ -59,6 +61,7 @@ tokensBT19 <- corpus_to_compound_tokens(corpBT19, popdictR::gruendl_terms)
 contextBT19 <- aggregate_context(tokensBT19, gruendl_patterns_to_underscore())
 saveRDS(contextBT19, file = "contextBT19.RDS")
 contextBT19_clean <- clean_contextdata(contextBT19$context)
+saveRDS(contextBT19_clean, file = "contextBT19_clean.RDS")
 distBT19_euclidean <- distance_matrix(contextBT19_clean, method = "euclidean")
 saveRDS(distBT19_euclidean, file = "distBT19_euclidean.RDS")
 
@@ -72,6 +75,7 @@ tokensBT20 <- corpus_to_compound_tokens(corpBT20, popdictR::gruendl_terms)
 contextBT20 <- aggregate_context(tokensBT20, gruendl_patterns_to_underscore())
 saveRDS(contextBT20, file = "contextBT20.RDS")
 contextBT20_clean <- clean_contextdata(contextBT20$context)
+saveRDS(contextBT20_clean, file = "contextBT20_clean.RDS")
 distBT20_euclidean <- distance_matrix(contextBT20_clean, method = "euclidean")
 saveRDS(distBT20_euclidean, file = "distBT20_euclidean.RDS")
 

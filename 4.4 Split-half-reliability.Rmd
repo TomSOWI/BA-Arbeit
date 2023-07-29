@@ -1,0 +1,70 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "29 7 2023"
+output: html_document
+---
+
+### Split-half-reliability
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(splithalfr)
+
+```
+
+```{r}
+list <- list()
+i = 1
+
+pattern <- dfClara$pattern
+
+half_1 <- sample(
+  x = pattern,
+  size = round(length(pattern)/2, 0),
+  replace = FALSE
+)
+half_2 <- pattern[!(pattern %in% half_1)]
+
+
+dfClara1 <- dfClara[dfClara$pattern %in% half_1,]
+dfClara2 <- dfClara[dfClara$pattern %in% half_2,]
+
+
+resultClara1 <- run_weighted_multiword_dict(
+  data = corpBT17_20_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfClara1,
+  dict_weight_name = "clara1",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = F
+)
+
+resultClara2 <- run_weighted_multiword_dict(
+  data = corpBT17_20_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfClara2,
+  dict_weight_name = "clara2",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = F
+)
+
+sb <- spearman_brown(vars[,1], vars[,2])
+
+
+list[i] <- sb
+
+i = i + 1
+```
+
+
+
+
+```{r}
+:
+```
+

@@ -13,7 +13,6 @@ output: html_document
 #### BT17
  
 ```{r}
-
 toksBT17 <- contextBT17_clean
 toksBT17$party <- contextBT17$party
 
@@ -151,66 +150,84 @@ termsNomatch <- terms[!terms %in% termsKmeans]
 
 
 ```{r}
+toksBT17 <- contextBT17_clean
+toksBT17$party <- contextBT17$party
 #BT17
-
+set.seed(123)
 kmeansBT17TrueK <- fviz_nbclust(as.matrix(distBT17_euclidean), kmeans, method = "wss") +    # total intra-cluster variation
-  geom_vline(xintercept = 4, linetype = 2)+
+  geom_vline(xintercept = 5, linetype = 2)+
   labs(subtitle = "Elbow method")
 
-truth.K = 4 
+truth.K = 5
 
 kmeansBT17K <- kmeans(distBT17_euclidean, truth.K, iter.max = 10, nstart = 2)
 ###Result
 kmeansBT17K.image <-fviz_cluster(object = kmeansBT17K, data = distBT17_euclidean,ellipse.type = "norm",
              geom = "point")
 
-save(kmeansBT17K, file = "dfKmeansBT17K.RDS")
-save(kmeansBT17K.image, file = "kmeansBT17K.image.RDS")
+saveRDS(kmeansBT17K, file = "kmeansBT17K.RDS")
+saveRDS(kmeansBT17K.image, file = "kmeansBT17K.image.RDS")
 
 # Cluster label asignment
 toksBT17$cluster.kmeans.trueK <- kmeansBT17K$cluster
 dfKmeansKLinke <- toksBT17[toksBT17$party == "DIE LINKE.",] 
 prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
 
+
+
 toksBT17$cluster.kmeans.trueK[toksBT17$cluster.kmeans.trueK == 1] <- 0
-toksBT17$cluster.kmeans.trueK[toksBT17$cluster.kmeans.trueK == 2] <- 1
+toksBT17$cluster.kmeans.trueK[toksBT17$cluster.kmeans.trueK == 2] <- 0
 toksBT17$cluster.kmeans.trueK[toksBT17$cluster.kmeans.trueK == 3] <- 0
 toksBT17$cluster.kmeans.trueK[toksBT17$cluster.kmeans.trueK == 4] <- 1
+toksBT17$cluster.kmeans.trueK[toksBT17$cluster.kmeans.trueK == 5] <- 0
+
+contextBT17$cluster.kmeans.trueK <- toksBT17$cluster.kmeans.trueK
 ```
 
 
 ```{r}
+toksBT18 <- contextBT18_clean
+toksBT18$party <- contextBT18$party
 #BT18
-
+set.seed(123)
 kmeansBT18TrueK <- fviz_nbclust(as.matrix(distBT18_euclidean), kmeans, method = "wss") +    # total intra-cluster variation
-  geom_vline(xintercept = 4, linetype = 2)+
+  geom_vline(xintercept = 6, linetype = 2)+
   labs(subtitle = "Elbow method")
 
-truth.K = 4 
+truth.K = 6 
 
-kmeansBT18K <- kmeans(distBT17_euclidean, truth.K, iter.max = 10, nstart = 2)
+kmeansBT18K <- kmeans(distBT18_euclidean, truth.K, iter.max = 10, nstart = 2)
 ###Result
 kmeansBT18K.image <-fviz_cluster(object = kmeansBT18K, data = distBT18_euclidean,ellipse.type = "norm",
              geom = "point")
 
-save(kmeansBT18K, file = "dfKmeansBT18K.RDS")
-save(kmeansBT18K.image, file = "kmeansBT18K.image.RDS")
+saveRDS(kmeansBT18K, file = "kmeansBT18K.RDS")
+saveRDS(kmeansBT18K.image, file = "kmeansBT18K.image.RDS")
 
 # Cluster label asignment
 toksBT18$cluster.kmeans.trueK <- kmeansBT18K$cluster
 dfKmeansKLinke <- toksBT18[toksBT18$party == "DIE LINKE.",] 
 prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
 
-
+toksBT18$cluster.kmeans.trueK[toksBT18$cluster.kmeans.trueK == 1] <- 0
 toksBT18$cluster.kmeans.trueK[toksBT18$cluster.kmeans.trueK == 2] <- 0
-toksBT18$cluster.kmeans.trueK[toksBT18$cluster.kmeans.trueK == 3] <- 0
+toksBT18$cluster.kmeans.trueK[toksBT18$cluster.kmeans.trueK == 3] <- 1
 toksBT18$cluster.kmeans.trueK[toksBT18$cluster.kmeans.trueK == 4] <- 1
+toksBT18$cluster.kmeans.trueK[toksBT18$cluster.kmeans.trueK == 5] <- 0
+toksBT18$cluster.kmeans.trueK[toksBT18$cluster.kmeans.trueK == 6] <- 1
+
+
+contextBT18$cluster.kmeans.trueK <- toksBT18$cluster.kmeans.trueK
 ```
 
 
 ```{r}
-#BT19
 
+toksBT19 <- contextBT19_clean
+toksBT19$party <- contextBT19$party
+
+#BT19
+set.seed(123)
 kmeansBT19TrueK <- fviz_nbclust(as.matrix(distBT19_euclidean), kmeans, method = "wss") +    # total intra-cluster variation
   geom_vline(xintercept = 4, linetype = 2)+
   labs(subtitle = "Elbow method")
@@ -222,8 +239,8 @@ kmeansBT19K <- kmeans(distBT19_euclidean, truth.K, iter.max = 10, nstart = 2)
 kmeansBT19K.image <-fviz_cluster(object = kmeansBT19K, data = distBT19_euclidean,ellipse.type = "norm",
              geom = "point")
 
-save(kmeansBT19K, file = "dfKmeansBT19K.RDS")
-save(kmeansBT19K.image, file = "kmeansBT19K.image.RDS")
+saveRDS(kmeansBT19K, file = "kmeansBT19K.RDS")
+saveRDS(kmeansBT19K.image, file = "kmeansBT19K.image.RDS")
 
 # Cluster label asignment
 toksBT19$cluster.kmeans.trueK <- kmeansBT19K$cluster
@@ -232,30 +249,35 @@ prop.table(table(dfKmeansKLinke$cluster.kmeans.trueK))
 dfKmeansKAfD <- toksBT19[toksBT19$party == "AfD",] 
 prop.table(table(dfKmeansKAfD$cluster.kmeans.trueK))
 
-toksBT19$cluster.kmeans.trueK[toksBT19$cluster.kmeans.trueK == 1] <- 0
+toksBT19$cluster.kmeans.trueK[toksBT19$cluster.kmeans.trueK == 1] <- 1
 toksBT19$cluster.kmeans.trueK[toksBT19$cluster.kmeans.trueK == 2] <- 0
 toksBT19$cluster.kmeans.trueK[toksBT19$cluster.kmeans.trueK == 3] <- 0
-toksBT19$cluster.kmeans.trueK[toksBT19$cluster.kmeans.trueK == 4] <- 1
+toksBT19$cluster.kmeans.trueK[toksBT19$cluster.kmeans.trueK == 4] <- 0
 
+contextBT19$cluster.kmeans.trueK <- toksBT19$cluster.kmeans.trueK
 ```
 
 
 ```{r}
 # BT20
 
+toksBT20 <- contextBT20_clean
+toksBT20$party <- contextBT20$party
+
+set.seed(123)
 kmeansBT20TrueK <- fviz_nbclust(as.matrix(distBT20_euclidean), kmeans, method = "wss") +    # total intra-cluster variation
-  geom_vline(xintercept = 4, linetype = 2)+
+  geom_vline(xintercept = 5, linetype = 2)+
   labs(subtitle = "Elbow method")
 
-truth.K = 4 
+truth.K = 5
 
 kmeansBT20K <- kmeans(distBT20_euclidean, truth.K, iter.max = 10, nstart = 2)
 # Result
 
 kmeansBT20K.image <-fviz_cluster(object = kmeansBT20K, data = distBT20_euclidean,ellipse.type = "norm",
              geom = "point")
-save(kmeansBT20K, file = "dfKmeansBT20K.RDS")
-save(kmeansBT20K.image, file = "kmeansBT20K.image.RDS")
+saveRDS(kmeansBT20K, file = "kmeansBT20K.RDS")
+saveRDS(kmeansBT20K.image, file = "kmeansBT20K.image.RDS")
 
 
 # Cluster label asignment
@@ -268,15 +290,18 @@ prop.table(table(dfKmeansKAfD$cluster.kmeans.trueK))
 toksBT20$cluster.kmeans.trueK[toksBT20$cluster.kmeans.trueK == 1] <- 0
 toksBT20$cluster.kmeans.trueK[toksBT20$cluster.kmeans.trueK == 2] <- 0
 toksBT20$cluster.kmeans.trueK[toksBT20$cluster.kmeans.trueK == 3] <- 1
-toksBT20$cluster.kmeans.trueK[toksBT20$cluster.kmeans.trueK == 4] <- 0
+toksBT20$cluster.kmeans.trueK[toksBT20$cluster.kmeans.trueK == 4] <- 1
+toksBT20$cluster.kmeans.trueK[toksBT20$cluster.kmeans.trueK == 5] <- 0
+
+contextBT20$cluster.kmeans.trueK <- toksBT20$cluster.kmeans.trueK
 
 ```
 
 
 ### Merge
 ```{r}
-dfKmeansK <-  rbind(toksBT17,toksBT18,toksBT19,toksBT20) 
-dfKmeansK <- aggregate(dfKmeansK$cluster, by = list(dfKmeansK$pattern), FUN = "mean")
+dfKmeansK <-  rbind(contextBT17,contextBT18,contextBT19,contextBT20) 
+dfKmeansK <- aggregate(dfKmeansK$cluster.kmeans.trueK, by = list(dfKmeansK$pattern), FUN = "mean")
 colnames(dfKmeansK) <- c("pattern","weight")
 dfKmeansK$pattern <- make_patterns_compound(dfKmeansK$pattern) #for merging later
 

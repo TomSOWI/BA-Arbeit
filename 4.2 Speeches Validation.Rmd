@@ -12,8 +12,8 @@ output: html_document
 ```{r}
 corp2014 <- corpus(df2014, text_field = "speech_content")
 saveRDS(corp2014, file = "corp2014.RDS")
-corp_2014clean <- expertyears_cleaning(corp2014, pattern = popdictR::gruendl_terms)
-saveRDS(corp_2014clean, file = "corp_2014_clean.RDS")
+corp_2014_clean <- corpus_to_compound_tokens(corp2014, pattern = popdictR::gruendl_terms)
+saveRDS(corp_2014_clean, file = "corp_2014_clean.RDS")
 
 
 pattern <- gruendl_patterns_to_compound()
@@ -22,7 +22,7 @@ result2014Clara <- run_weighted_multiword_dict(
   data = corp_2014_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraJaccard,
+  dict_weight = dfClara,
   dict_weight_name = "clara",
   prepare_corp = FALSE,
   include_main_dict = TRUE,
@@ -30,12 +30,11 @@ result2014Clara <- run_weighted_multiword_dict(
 )
 
 
-
 result2014ClaraK <- run_weighted_multiword_dict(
   data = corp_2014_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraKJaccard,
+  dict_weight = dfClaraK,
   dict_weight_name = "claraK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -57,7 +56,7 @@ result2014KmeansK <- run_weighted_multiword_dict(
   data = corp_2014_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfKmeans,
+  dict_weight = dfKmeansK,
   dict_weight_name = "kmeansK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -97,7 +96,7 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 corp2017 <- corpus(df2017, text_field = "speech_content")
 saveRDS(corp2017, file = "corp2017.RDS")
 corp_2017clean <- expertyears_cleaning(corp = corp2017, pattern = popdictR::gruendl_terms)
-saveRDS(corp_2017clean, file = "corp_2017_clean.RDS")
+saveRDS(corp_2017_clean, file = "corp_2017_clean.RDS")
 
 
 
@@ -108,7 +107,7 @@ result2017Clara <- run_weighted_multiword_dict(
   data = corp_2017_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraJaccard,
+  dict_weight = dfClara,
   dict_weight_name = "clara",
   prepare_corp = FALSE,
   include_main_dict = TRUE,
@@ -121,7 +120,7 @@ result2017ClaraK <- run_weighted_multiword_dict(
   data = corp_2017_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraKJaccard,
+  dict_weight = dfClaraK,
   dict_weight_name = "claraK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -143,7 +142,7 @@ result2017KmeansK <- run_weighted_multiword_dict(
   data = corp_2017_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfKmeans,
+  dict_weight = dfKmeansK,
   dict_weight_name = "kmeansK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -185,8 +184,8 @@ for (i in c("gruendl", "clara","claraK","kmeans","kmeansK")) {
 ```{r}
 corp2019 <- corpus(df2019, text_field = "speech_content")
 saveRDS(corp2019, file = "corp2019.RDS")
-corp_2019clean <- expertyears_cleaning(corpus(TestData, text_field = "speech_content"), pattern = popdictR::gruendl_terms)
-saveRDS(corp_2019clean, file = "corp_2019_clean.RDS")
+corp_2019_clean <- expertyears_cleaning(corp2019, pattern = popdictR::gruendl_terms)
+saveRDS(corp_2019_clean, file = "corp_2019_clean.RDS")
 
 
 
@@ -197,7 +196,7 @@ result2019Clara <- run_weighted_multiword_dict(
   data = corp_2019_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraJaccard,
+  dict_weight = dfClara,
   dict_weight_name = "clara",
   prepare_corp = FALSE,
   include_main_dict = TRUE,
@@ -210,7 +209,7 @@ result2019ClaraK <- run_weighted_multiword_dict(
   data = corp_2019_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfClaraKJaccard,
+  dict_weight = dfClaraK,
   dict_weight_name = "claraK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -232,7 +231,7 @@ result2019KmeansK <- run_weighted_multiword_dict(
   data = corp_2019_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
-  dict_weight = dfKmeans,
+  dict_weight = dfKmeansK,
   dict_weight_name = "kmeansK",
   prepare_corp = FALSE,
   include_main_dict = F,
@@ -300,10 +299,70 @@ dfValidation <- data.frame(Jahr,gruendl,clara,claraK,kmeans,kmeansK)
 gtValidation <- gt(dfValidation,rowname_col = "Jahre") %>%  
   tab_header(
    title = "Tabelle 1: Dictionaries im Vergleich ",
-   subtitle = "Zusammenhang zwischen Dictionaries und Expertenbefragungen nach Jahren") #%>%
-   #gtsave("gtValidation.tex")
+   subtitle = "Zusammenhang zwischen Dictionaries und Expertenbefragungen nach Jahren") %>%
+   gtsave("speechesValidation.tex")
 ```
 
+##############################
+## deskriptive Inferenz
+##############################
 
+```{r}
+
+result2014 <- result2014Clara %>%
+  select(party, gruendl, n_sentences)%>%
+  rename("2014" = gruendl)
+result2014$party[result2014$party == "DIE LINKE."] <- "LINKE"
+
+result2014$'2014' <- round(result2014$'2014'/result2014$n_sentences * 100, digits = 2)
+result2014$n_sentences <- NULL
+result2014[nrow(result2014) + 1,] <- list("AfD", NA,NA)
+result2014[nrow(result2014) + 1,] <- list("FDP", NA,NA)
+
+
+### 2017 -----------------------------------------------------------------------
+result2017 <- result2017Clara %>%
+  select(party, gruendl, n_sentences)%>%
+  rename("2017" = gruendl)
+result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
+
+result2017$'2017' <- round(result2017$'2017'/result2017$n_sentences * 100, digits = 2)
+result2017$n_sentences <- NULL
+
+### 2021 -----------------------------------------------------------------------
+result2019 <- result2019Clara %>%
+  select(party, gruendl, n_sentences) %>%
+  rename("2019" = gruendl)
+
+result2019$party[result2019$party == "DIE LINKE."] <- "LINKE"
+result2019$party[result2019$party == "Fraktionslos"] <- NA
+result2019 <- na.omit(result2019)
+
+result2019$'2019' <- round(result2019$'2019'/result2019$n_sentences * 100, digits = 2)
+result2019$n_sentences <- NULL
+
+
+#result <- bind_cols(result2013, select(result2017,'2017'),select(result2021,'2021'))
+#result <- merge(result2013, merge(select(result2017,'2017',n_sentences),select(result2021,'2021',n_sentences)))
+result <- merge(result2014, merge(result2017, result2019))
+
+
+
+### Tabelle --------------------------------------------------------------------
+
+gt(result,rowname_col = "party") %>%  
+  tab_header(
+   title = "Tabelle 2: Populistische Saetze in Bundestagsreden nach Parteien"
+  ) %>%
+  tab_spanner(
+    label = "Prozentanteil populistischer Saetze",
+    columns = c('2014','2017', '2019')) %>%
+  #cols_move_to_start("PopuList") %>%
+  tab_stubhead(label = "Fraktionen") %>%
+  gtsave("deskriptivSpeeches.tex")
+
+
+
+```
 
 

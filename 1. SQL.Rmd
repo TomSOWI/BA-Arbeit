@@ -49,7 +49,7 @@ BT19 <- dbGetQuery(con,
                         s.faction_id = f.id
                         WHERE date BETWEEN '2017-10-24' AND '2021-10-25'
                         AND NOT abbreviation = 'not found';")
-head(BT19)
+
 #24. Oktober 2017 bis zum 26. Oktober 2021
 BT18 <- dbGetQuery(con,
                        "SELECT s.id,s.speech_content,s.date,f.abbreviation AS party
@@ -84,6 +84,7 @@ saveRDS(BT17, file = "BT17.RDS")
 saveRDS(BT18, file = "BT18.RDS")
 saveRDS(BT19, file = "BT19.RDS")
 saveRDS(BT20, file = "BT20.RDS")
+saveRDS(BT17_20, file = "BT17_20.RDS")
 
 
 # get data tables for expertvalidation ---------------------------------------------------------

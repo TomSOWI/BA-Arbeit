@@ -41,7 +41,7 @@ exp_2019 <- exp_2019 %>% filter(party %in% c("CDU/CSU","SPD","Grüne","LINKE","A
 
 #rowMeans Indexbildung und Z-Transformation
 exp_2019$expert_rating <- as.numeric(rowMeans(exp_2019[c("people_vs_elite","antielite_salience")],))
-exp_2019$expert_rating <- scale(exp_2019$expert_rating, center = T)
+exp_2019$expert_rating_z <- scale(exp_2019$expert_rating, center = T)
 
 #Remove
 exp_2019$antielite_salience <- NULL
@@ -110,7 +110,7 @@ cses$CSU <- NULL
 #Konstruktion des gewünschten Daframe-Formats
 exp_2017 <- as.data.frame(t(cses))
 exp_2017 <- exp_2017 %>% rename(expert_rating = '18515') %>% select(expert_rating)
-exp_2017$expert_rating <- scale(exp_2017$expert_rating, center = T)
+exp_2017$expert_rating_z <- scale(exp_2017$expert_rating, center = T)
 exp_2017$party <- rownames(exp_2017)
 
 saveRDS(exp_2017, file = "exp2017.RDS")
@@ -167,3 +167,25 @@ saveRDS(exp_2014_afd, file = "exp2014_afd.RDS")
 
 ```
 
+##############################
+## Visualiserung Experteneinordnungen
+##############################
+
+
+
+```{r}
+expResults <- merge(merge(exp2014_afd, exp2017, by = "party"), exp2019, by = "party")
+colnames(expResults) <- c("Partei", "2014","2014_z","2017","2017_z","2019","2019_z")
+
+expResults$`2014` <- round(expResults$`2014`, digits = 2)
+expResults$`2014_z` <- round(expResults$`2014_z`, digits = 2)
+expResults$`2017_z` <- round(expResults$`2017_z`, digits = 2)
+expResults$`2019` <- round(expResults$`2019`, digits = 2)
+expResults$`2019_z` <- round(expResults$`2019_z`, digits = 2)
+
+gtExpert <- gt(expResults) %>%  
+  tab_header(
+   title = "Tabelle 1: Populismuseinordnung der Parteien nach Expertenbefragungen")
+   #gtsave("gtValidation.tex")
+```
+ 

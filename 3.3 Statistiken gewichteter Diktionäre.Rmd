@@ -6,26 +6,56 @@ output: html_document
 ---
 
 
-### General
-
+### Bundestagsreden
 
 ```{r}
 
 corpBT17_20 <- corpus(BT17_20, text_field = "speech_content")
 
 statsBT17_20 <- multidictR::get_pattern_stats(corpBT17_20, patterns = popdictR::gruendl_terms)
+statsMP <- multidictR::get_pattern_stats(corp_mp_clean, patterns = popdictR::gruendl_terms)
 
-minstatsBT17_20 <- statsBT17_20[statsBT17_20$match_count < 10 & statsBT17_20$match_count != 0,]
+stats <- merge(statsBT17_20, statsMP, by = "original_pattern")
+
+stats$match_count <- stats$match_count.x + stats$match_count.y
+
+#minstatsBT17_20 <- statsBT17_20[statsBT17_20$match_count < 10 & statsBT17_20$match_count != 0,]
+
+stats$original_pattern <- make_patterns_compound(statsBT17_20$original_pattern)
+stats <- merge(stats, dfClara, by.x = "original_pattern", by.y = "pattern")
+
+stats <- statsBT[stats$match_count >= 10,]
+stats <- statsBT[order(-statsBT$weight),]
+
+head(stats$original_pattern, 5) #höchste Gewichtung
+tail(stats$original_pattern, 5) #niedrigste Gewichtung
 
 ```
 
-#############
-## Kmeans Diktionär
-#############
+### Anwendung
 
 ```{r}
-table(dfKmeans$weight)
+patterns_max <- c("\\bwei(ß|ss) (.*? )??bevölkerung\\b","\\bnomenklatura\\b","\\bsagen_dürfen\\b","\\bschande\\b","\\bfrechheit\\b")
+patterns_min <- c("\\bauf_kosten_der_allgemeinheit\\b", "\\bwahnwitzig(e|er|es|en|em)??\\b","\\bzu(_)??lasten_de(s|r)_deutsche(n|r)\\b","\\bzum_schaden_de(s|r)\\b","\\b(will|(ein)??fordert|möchte|mag|verlangt|beansprucht|wünscht)_(.*?_)??allgemeinheit\\b")
 
+
+kwicMax <- kwic(corpBT17_20, patterns_max, valuetype = "regex", window = 15)
+kwicMax1 <- kwicMax[kwicMax$pattern]
+
+corpBT17_20[docnames(corpBT17_20) == "text80383"][[1]]
+
+table(kwicMax$keyword)
+
+kwicMin <- kwic(corpBT17_20, patterns_min, valuetype = "regex", window = 10)
 
 ```
+
+### Party Manifesto
+
+```{r}
+
+kwicMaxMP <- kwic(corp_mp_clean, patterns_max,valuetype = "regex", window = 15)
+kwicMinMP <- kwic(corp_mp_clean, patterns_min,valuetype = "regex", window = 15)
+```
+
 
