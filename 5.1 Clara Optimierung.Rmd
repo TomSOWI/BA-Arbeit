@@ -1,0 +1,69 @@
+---
+title: "Untitled"
+author: "Tom Klotz"
+date: "30 7 2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Überarbeitung für den DACH Raum
+
+```{r}
+popdictR::gruendl_terms
+
+dfClara$pattern
+```
+
+
+#0.4375000
+"auf kosten de(s|r) österreich(er|ers|erinnen|erin|ischer|ischen)"
+"auf kosten de(s|r) deutsche(n|r)" 
+"auf kosten de(s|r) schweizer(s|innen|in|ischer|ischen)?"                                                                                             
+
+#0.8000000
+"österreichische(n|r)? tradition(en)?"
+"deutsche(n|r)? tradition(en)?"
+"schweizer tradition(en)?"                                                                                                                            
+
+#0.0000000
+"(a|ä)ngst(e)? (de(s|r)|eine(s|r)|unsere(s|r)) österreich(er|ers|erinnen|erin|ischer|ischen)"
+"(a|ä)ngst(e)? (de(s|r)|eine(s|r)|unsere(s|r)) schweizer(s|innen|in|ischer|ischen)?"
+"(a|ä)ngst(e)? (de(s|r)|eine(s|r)|unsere(s|r)) deutsche(n|r)" 
+
+
+##1.0000000 
+"durchschnittlich(e|er|es|en|em) österreich(er|ers|ern|erinnen|erin|ische|ischer|isches|ischen|ischem)" 
+"durchschnittlich(e|er|es|en|em) deutsche(n|r|s|m)?"
+"durchschnittlich(e|er|es|en|em) schweizer(s|n|innen|in|ische|ischer|isches|ischen|ischem)?"
+
+#0.3928571
+"zu( )?lasten de(s|r) deutsche(n|r)"                                                                                                                  
+"zu( )?lasten de(s|r) österreich(er|ers|erinnen|erin|ischer|ischen)"
+"zu( )?lasten de(s|r) schweizer(s|innen|in|ischer|ischen)?"  
+
+#1.0000000                                                       
+"durchschnitts(-)?schweizer(s|n|innen|in|ische|ischer|isches|ischen|ischem)?"
+"durchschnitts(-)?österreich(er|ers|ern|erinnen|erin|ische|ischer|isches|ischen|ischem)"
+"durchschnitts(-)?deutsche(n|r|s|m)?"                                                                                                                 
+
+#0.2857143
+"(.*)arbeitend(e|er|es|en|em) deutsche(n|r|s|m)?"                                                                                                     
+"(.*)arbeitend(e|er|es|en|em) österreich(er|ers|ern|erinnen|erin|ische|ischer|isches|ischen|ischem)"                                                  
+"(.*)arbeitend(e|er|es|en|em) schweizer(s|n|innen|in|ische|ischer|isches|ischen|ischem)?"
+
+
+
+```{r}
+dfDACH <- data.frame(list(
+  pattern = c("auf kosten de(s|r) österreich(er|ers|erinnen|erin|ischer|ischen)","auf kosten de(s|r) schweizer(s|innen|in|ischer|ischen)?","österreichische(n|r)? tradition(en)?", "schweizer tradition(en)?", "(a|ä)ngst(e)? (de(s|r)|eine(s|r)|unsere(s|r)) österreich(er|ers|erinnen|erin|ischer|ischen)","(a|ä)ngst(e)? (de(s|r)|eine(s|r)|unsere(s|r)) schweizer(s|innen|in|ischer|ischen)?","durchschnittlich(e|er|es|en|em) schweizer(s|n|innen|in|ische|ischer|isches|ischen|ischem)?","durchschnittlich(e|er|es|en|em) österreich(er|ers|ern|erinnen|erin|ische|ischer|isches|ischen|ischem)", "zu( )?lasten de(s|r) österreich(er|ers|erinnen|erin|ischer|ischen)", "zu( )?lasten de(s|r) schweizer(s|innen|in|ischer|ischen)?", "durchschnitts(-)?schweizer(s|n|innen|in|ische|ischer|isches|ischen|ischem)?", "durchschnitts(-)?österreich(er|ers|ern|erinnen|erin|ische|ischer|isches|ischen|ischem)", "(.*)arbeitend(e|er|es|en|em) österreich(er|ers|ern|erinnen|erin|ische|ischer|isches|ischen|ischem)", "(.*)arbeitend(e|er|es|en|em) schweizer(s|n|innen|in|ische|ischer|isches|ischen|ischem)?" ),
+  weight = c(0.4375000, 0.4375000, 0.8, 0.8, 0, 0, 1, 1, 0.3928571, 0.3928571, 1, 1, 0.2857143, 0.2857143 ))
+)
+
+dfDACH$pattern <- make_patterns_compound(dfDACH$pattern)
+
+dfClaraDACH <- rbind(dfClara, dfDACH)
+```
+

@@ -19,16 +19,15 @@ stats <- merge(statsBT17_20, statsMP, by = "original_pattern")
 
 stats$match_count <- stats$match_count.x + stats$match_count.y
 
-#minstatsBT17_20 <- statsBT17_20[statsBT17_20$match_count < 10 & statsBT17_20$match_count != 0,]
 
 stats$original_pattern <- make_patterns_compound(statsBT17_20$original_pattern)
 stats <- merge(stats, dfClara, by.x = "original_pattern", by.y = "pattern")
 
-stats <- statsBT[stats$match_count >= 10,]
-stats <- statsBT[order(-statsBT$weight),]
+maxstats <- stats[stats$match_count >= 10,]
+maxstats <- maxstats[order(-maxstats$weight),]
 
-head(stats$original_pattern, 5) #höchste Gewichtung
-tail(stats$original_pattern, 5) #niedrigste Gewichtung
+head(maxstats$original_pattern, 5) #höchste Gewichtung
+tail(maxstats$original_pattern, 5) #niedrigste Gewichtung
 
 ```
 
@@ -58,4 +57,352 @@ kwicMaxMP <- kwic(corp_mp_clean, patterns_max,valuetype = "regex", window = 15)
 kwicMinMP <- kwic(corp_mp_clean, patterns_min,valuetype = "regex", window = 15)
 ```
 
+
+### Clara vs Clara without low frequent terms
+
+##### Speeches
+
+
+```{r}
+minstats <- stats[stats$match_count < 10 & stats$match_count != 0,]
+
+dfClara10 <- dfClara[!(dfClara$pattern %in% minstats$original_pattern),]
+
+
+###2014 ------------------------------------------------------------------------
+
+result2014Clara10 <- run_weighted_multiword_dict(
+  data = corp_2014_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl10",
+  dict_weight = dfClara10,
+  dict_weight_name = "clara10",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
+
+result2014Clara <- run_weighted_multiword_dict(
+  data = corp_2014_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfClara,
+  dict_weight_name = "clara",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = TRUE
+)
+
+
+result2014 <- bind_cols(result2014Clara,select(result2014Clara10, clara10, gruendl10))
+                        
+
+result2014$party[result2014$party == "DIE LINKE."] <- "LINKE"
+result2014 <- na.omit(result2014)
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+  result2014[[i]] <- result2014[[i]] / result2014$n_sentences
+  result2014[[i]] <- scale(result2014[[i]], center = T)
+}
+
+validation2014 <- merge(result2014, exp2014)
+
+correlation2014 <- list()
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+    correlation <- cor(x = validation2014[[i]], y = validation2014$expert_rating, method = "pearson")
+    correlation2014[[i]] <- correlation 
+}
+
+###2017 ------------------------------------------------------------------------
+
+result2017Clara10 <- run_weighted_multiword_dict(
+  data = corp_2017_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl10",
+  dict_weight = dfClara10,
+  dict_weight_name = "clara10",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
+
+result2017Clara <- run_weighted_multiword_dict(
+  data = corp_2017_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfClara,
+  dict_weight_name = "clara",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = TRUE
+)
+
+
+result2017 <- bind_cols(result2017Clara,select(result2017Clara10, clara10, gruendl10))
+                        
+
+result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
+result2017$party[result2017$party == "Fraktionslos"] <- NA
+result2017 <- na.omit(result2017)
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+  result2017[[i]] <- result2017[[i]] / result2017$n_sentences
+  result2017[[i]] <- scale(result2017[[i]], center = T)
+}
+
+validation2017 <- merge(result2017, exp2017)
+
+correlation2017 <- list()
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+    correlation <- cor(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
+    correlation2017[[i]] <- correlation 
+}
+
+###2019 ------------------------------------------------------------------------
+
+result2019Clara10 <- run_weighted_multiword_dict(
+  data = corp_2019_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl10",
+  dict_weight = dfClara10,
+  dict_weight_name = "clara10",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
+
+result2019Clara <- run_weighted_multiword_dict(
+  data = corp_2019_clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfClara,
+  dict_weight_name = "clara",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = TRUE
+)
+
+
+result2019 <- bind_cols(result2019Clara,select(result2019Clara10, clara10, gruendl10))
+                      
+
+result2019$party[result2019$party == "DIE LINKE."] <- "LINKE"
+result2019$party[result2019$party == "Fraktionslos"] <- NA
+result2019 <- na.omit(result2019)
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+  result2019[[i]] <- result2019[[i]] / result2019$n_sentences
+  result2019[[i]] <- scale(result2019[[i]], center = T)
+}
+
+validation2019 <- merge(result2019, exp2019)
+
+correlation2019 <- list()
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+    correlation <- cor(x = validation2019[[i]], y = validation2019$expert_rating, method = "pearson")
+    correlation2019[[i]] <- correlation 
+}
+
+###Grafik ----------------------------------------------------------------------
+
+Jahr <- c(2014,2017,2019,"Durchschnitt")
+gruendl_mean <- (correlation2014$gruendl + correlation2017$gruendl + correlation2019$gruendl)/3
+gruendl <- round(c(correlation2014$gruendl, correlation2017$gruendl, correlation2019$gruendl, gruendl_mean), digits = 3)
+
+gruendl_mean10 <- (correlation2014$gruendl10 + correlation2017$gruendl10 + correlation2019$gruendl10)/3
+gruendl10 <- round(c(correlation2014$gruendl10, correlation2017$gruendl10, correlation2019$gruendl10, gruendl_mean10), digits = 3)
+
+clara_mean <- (correlation2014$clara + correlation2017$clara + correlation2019$clara)/3
+clara <- round(c(correlation2014$clara, correlation2017$clara, correlation2019$clara, clara_mean), digits = 3)
+
+clara_mean10 <- (correlation2014$clara10 + correlation2017$clara10 + correlation2019$clara10)/3
+clara10 <- round(c(correlation2014$clara10, correlation2017$clara10, correlation2019$clara10, clara_mean10), digits = 3)
+               
+              
+
+dfValidation <- data.frame(Jahr, gruendl, gruendl10, clara, clara10)
+
+
+gtValidation <- gt(dfValidation,rowname_col = "Jahre") %>%  
+  tab_header(
+   title = "Tabelle 1: Dictionaries im Vergleich ",
+   subtitle = "Zusammenhang zwischen Dictionaries und Expertenbefragungen nach Jahren") %>%
+   gtsave("speechesValidation10.tex")
+
+```
+
+#### MP
+
+
+```{r}
+minstats <- stats[stats$match_count < 10 & stats$match_count != 0,]
+
+dfClara10 <- dfClara[!(dfClara$pattern %in% minstats$original_pattern),]
+
+
+###2013 ------------------------------------------------------------------------
+
+result2013Clara10 <- run_weighted_multiword_dict(
+  data = mp2013Clean,
+  dict_compound = pattern,
+  dict_name = "gruendl10",
+  dict_weight = dfClara10,
+  dict_weight_name = "clara10",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
+
+result2013Clara <- run_weighted_multiword_dict(
+  data = mp2013Clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfClara,
+  dict_weight_name = "clara",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = TRUE
+)
+
+
+result2013 <- bind_cols(result2013Clara,select(result2013Clara10, clara10, gruendl10))
+                        
+
+result2013$party[result2013$party == "DIE LINKE."] <- "LINKE"
+result2013 <- na.omit(result2013)
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+  result2013[[i]] <- result2013[[i]] / result2013$n_sentences
+  result2013[[i]] <- scale(result2013[[i]], center = T)
+}
+
+validation2013 <- merge(result2013, exp2014_afd)
+
+correlation2013 <- list()
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+    correlation <- cor(x = validation2013[[i]], y = validation2013$expert_rating, method = "pearson")
+    correlation2013[[i]] <- correlation 
+}
+
+###2017 ------------------------------------------------------------------------
+
+result2017Clara10 <- run_weighted_multiword_dict(
+  data = mp2017Clean,
+  dict_compound = pattern,
+  dict_name = "gruendl10",
+  dict_weight = dfClara10,
+  dict_weight_name = "clara10",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
+
+result2017Clara <- run_weighted_multiword_dict(
+  data = mp2017Clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfClara,
+  dict_weight_name = "clara",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = TRUE
+)
+
+
+result2017 <- bind_cols(result2017Clara,select(result2017Clara10, clara10, gruendl10))
+                        
+
+result2017$party[result2017$party == "DIE LINKE."] <- "LINKE"
+result2017 <- na.omit(result2017)
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+  result2017[[i]] <- result2017[[i]] / result2017$n_sentences
+  result2017[[i]] <- scale(result2017[[i]], center = T)
+}
+
+validation2017 <- merge(result2017, exp2017)
+
+correlation2017 <- list()
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+    correlation <- cor(x = validation2017[[i]], y = validation2017$expert_rating, method = "pearson")
+    correlation2017[[i]] <- correlation 
+}
+
+###2021 ------------------------------------------------------------------------
+
+result2021Clara10 <- run_weighted_multiword_dict(
+  data = mp2021Clean,
+  dict_compound = pattern,
+  dict_name = "gruendl10",
+  dict_weight = dfClara10,
+  dict_weight_name = "clara10",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = FALSE
+)
+
+result2021Clara <- run_weighted_multiword_dict(
+  data = mp2021Clean,
+  dict_compound = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfClara,
+  dict_weight_name = "clara",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE,
+  include_totals = TRUE
+)
+
+
+result2021 <- bind_cols(result2021Clara,select(result2021Clara10, clara10, gruendl10))
+                        
+
+result2021$party[result2021$party == "DIE LINKE."] <- "LINKE"
+result2021 <- na.omit(result2021)
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+  result2021[[i]] <- result2021[[i]] / result2021$n_sentences
+  result2021[[i]] <- scale(result2021[[i]], center = T)
+}
+
+validation2021 <- merge(result2021, exp2019)
+
+correlation2021 <- list()
+
+for (i in c("gruendl","gruendl10", "clara","clara10")) {
+    correlation <- cor(x = validation2021[[i]], y = validation2021$expert_rating, method = "pearson")
+    correlation2021[[i]] <- correlation 
+}
+
+###Grafik ----------------------------------------------------------------------
+
+Jahr <- c(2013,2017,2021,"Durchschnitt")
+gruendl_mean <- (correlation2013$gruendl + correlation2017$gruendl + correlation2021$gruendl)/3
+gruendl <- round(c(correlation2013$gruendl, correlation2017$gruendl, correlation2021$gruendl, gruendl_mean), digits = 3)
+
+gruendl_mean10 <- (correlation2013$gruendl10 + correlation2017$gruendl10 + correlation2021$gruendl10)/3
+gruendl10 <- round(c(correlation2013$gruendl10, correlation2017$gruendl10, correlation2021$gruendl10, gruendl_mean10), digits = 3)
+
+clara_mean <- (correlation2013$clara + correlation2017$clara + correlation2021$clara)/3
+clara <- round(c(correlation2013$clara, correlation2017$clara, correlation2021$clara, clara_mean), digits = 3)
+
+clara_mean10 <- (correlation2013$clara10 + correlation2017$clara10 + correlation2021$clara10)/3
+clara10 <- round(c(correlation2013$clara10, correlation2017$clara10, correlation2021$clara10, clara_mean10), digits = 3)
+               
+              
+
+dfValidation <- data.frame(Jahr, gruendl, gruendl10, clara, clara10)
+
+
+gtValidation <- gt(dfValidation,rowname_col = "Jahre") %>%  
+  tab_header(
+   title = "Tabelle 1: Dictionaries im Vergleich ",
+   subtitle = "Zusammenhang zwischen Dictionaries und Expertenbefragungen nach Jahren") %>%
+   gtsave("mpValidation10.tex")
+
+```
 
