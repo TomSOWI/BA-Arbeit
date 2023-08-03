@@ -32,7 +32,7 @@ dfClara2 <- dfClara[dfClara$pattern %in% half_2,]
 
 
 resultClara1 <- run_weighted_multiword_dict(
-  data = corpBT17_20_clean,
+  data = toksBT17_20_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
   dict_weight = dfClara1,
@@ -42,8 +42,22 @@ resultClara1 <- run_weighted_multiword_dict(
   include_totals = F
 )
 
+resultClara1 <- weightdictR::run_weightdictR(
+  data = toksBT17_20_clean,
+  dict = pattern,
+  dict_name = "gruendl",
+  dict_weight = dfClara1,
+  dict_weight_name = "clara1",
+  prepare_corp = FALSE,
+  include_main_dict = TRUE
+  #include_totals = F
+)
+
+
+
+
 resultClara2 <- run_weighted_multiword_dict(
-  data = corpBT17_20_clean,
+  data = toksBT17_20_clean,
   dict_compound = pattern,
   dict_name = "gruendl",
   dict_weight = dfClara2,

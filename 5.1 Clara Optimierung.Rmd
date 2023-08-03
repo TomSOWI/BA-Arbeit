@@ -65,5 +65,8 @@ dfDACH <- data.frame(list(
 dfDACH$pattern <- make_patterns_compound(dfDACH$pattern)
 
 dfClaraDACH <- rbind(dfClara, dfDACH)
+
+saveRDS(dfClaraDACH, file = "dfClaraDACH.RDS")
+
 ```
 

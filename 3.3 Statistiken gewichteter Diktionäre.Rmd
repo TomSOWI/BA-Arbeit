@@ -6,55 +6,64 @@ output: html_document
 ---
 
 
-### Bundestagsreden
-
-```{r}
-
-corpBT17_20 <- corpus(BT17_20, text_field = "speech_content")
-
-statsBT17_20 <- multidictR::get_pattern_stats(corpBT17_20, patterns = popdictR::gruendl_terms)
-statsMP <- multidictR::get_pattern_stats(corp_mp_clean, patterns = popdictR::gruendl_terms)
-
-stats <- merge(statsBT17_20, statsMP, by = "original_pattern")
-
-stats$match_count <- stats$match_count.x + stats$match_count.y
-
-
-stats$original_pattern <- make_patterns_compound(statsBT17_20$original_pattern)
-stats <- merge(stats, dfClara, by.x = "original_pattern", by.y = "pattern")
-
-maxstats <- stats[stats$match_count >= 10,]
-maxstats <- maxstats[order(-maxstats$weight),]
-
-head(maxstats$original_pattern, 5) #höchste Gewichtung
-tail(maxstats$original_pattern, 5) #niedrigste Gewichtung
-
-```
 
 ### Anwendung
 
 ```{r}
-patterns_max <- c("\\bwei(ß|ss) (.*? )??bevölkerung\\b","\\bnomenklatura\\b","\\bsagen_dürfen\\b","\\bschande\\b","\\bfrechheit\\b")
-patterns_min <- c("\\bauf_kosten_der_allgemeinheit\\b", "\\bwahnwitzig(e|er|es|en|em)??\\b","\\bzu(_)??lasten_de(s|r)_deutsche(n|r)\\b","\\bzum_schaden_de(s|r)\\b","\\b(will|(ein)??fordert|möchte|mag|verlangt|beansprucht|wünscht)_(.*?_)??allgemeinheit\\b")
-
-
-kwicMax <- kwic(corpBT17_20, patterns_max, valuetype = "regex", window = 15)
-kwicMax1 <- kwicMax[kwicMax$pattern]
-
-corpBT17_20[docnames(corpBT17_20) == "text80383"][[1]]
-
-table(kwicMax$keyword)
-
-kwicMin <- kwic(corpBT17_20, patterns_min, valuetype = "regex", window = 10)
-
+corpBT17_20 <- corpus(BT17_20, text_field = "speech_content")
+toksBT17_20_clean <- get_pop_tokens_updated(corpBT17_20,create_compounds = T,compounds_dict = popdictR::gruendl_terms,compounds_at_level = "sentences")
+saveRDS(toksBT17_20_clean, file = "toksBT17_20_clean.RDS")
 ```
-
-### Party Manifesto
 
 ```{r}
 
-kwicMaxMP <- kwic(corp_mp_clean, patterns_max,valuetype = "regex", window = 15)
-kwicMinMP <- kwic(corp_mp_clean, patterns_min,valuetype = "regex", window = 15)
+stats <- weightdictR::get_pattern_stats(toksBT17_20_clean, gruendl_patterns_to_compound(), regex = TRUE)
+stats <- merge(stats, dfClara)
+saveRDS(stats, file = "dfClaraMatchcount.RDS")
+
+maxstats <- stats[stats$match_count >= 10,]
+maxstats <- maxstats[order(-maxstats$weight),]
+
+head(maxstats$pattern, 5) #höchste Gewichtung
+tail(maxstats$pattern, 5) #niedrigste Gewichtung
+```
+
+
+
+#### Max
+
+```{r}
+patterns_max <- c("\\bnomenklatura\\b","\\bsagen_dürfen\\b","\\bschande\\b","\\bfrechheit\\b","\\bbürgerfern(e|er|es|en|em)??\\b")
+
+kwicMax <- kwic(toksBT17_20_clean, patterns_max, valuetype = "regex", window = 15)
+
+#corpBT17_20[docnames(corpBT17_20) == "text80383"][[1]]
+#corpBT17_20[docnames(corpBT17_20) == "text55829"][[1]]
+#corpBT17_20[docnames(corpBT17_20) == "text5843"][[1]]
+#corpBT17_20[docnames(corpBT17_20) == "text63834"][[1]]
+#corpBT17_20[docnames(corpBT17_20) == "text69158"][[1]]
+#corpBT17_20[docnames(corpBT17_20) == "text76406"][[1]]
+#corpBT17_20[docnames(corpBT17_20) == "text72726"][[1]]
+#corpBT17_20[docnames(corpBT17_20) == "text44494"][[1]]
+#corpBT17_20[docnames(corpBT17_20) == "text66331"][[1]]
+#corpBT17_20[docnames(corpBT17_20) == "text7061"][[1]]
+
+table(kwicMax$keyword)
+```
+
+#### Min
+
+```{r}
+patterns_min <- c("\\bauf_kosten_de(s|r)_deutsche(n|r)\\b","\\bauf_kosten_der_allgemeinheit\\b","\\bwahnwitzig(e|er|es|en|em)??\\b","\\bzu(_)??lasten_de(s|r)_deutsche(n|r)\\b","\\bzum_schaden_de(s|r)\\b")
+
+kwicMin <- kwic(toksBT17_20_clean, patterns_min, valuetype = "regex", window = 10)
+
+corpBT17_20[docnames(corpBT17_20) == "text67915"][[1]]
+corpBT17_20[docnames(corpBT17_20) == "text88183"][[1]]
+corpBT17_20[docnames(corpBT17_20) == "text63121"][[1]]
+corpBT17_20[docnames(corpBT17_20) == "text7097"][[1]]
+
+table(kwicMin$keyword)
 ```
 
 
@@ -66,7 +75,7 @@ kwicMinMP <- kwic(corp_mp_clean, patterns_min,valuetype = "regex", window = 15)
 ```{r}
 minstats <- stats[stats$match_count < 10 & stats$match_count != 0,]
 
-dfClara10 <- dfClara[!(dfClara$pattern %in% minstats$original_pattern),]
+dfClara10 <- dfClara[!(dfClara$pattern %in% minstats$pattern),]
 
 
 ###2014 ------------------------------------------------------------------------
@@ -240,7 +249,7 @@ gtValidation <- gt(dfValidation,rowname_col = "Jahre") %>%
 ```{r}
 minstats <- stats[stats$match_count < 10 & stats$match_count != 0,]
 
-dfClara10 <- dfClara[!(dfClara$pattern %in% minstats$original_pattern),]
+dfClara10 <- dfClara[!(dfClara$pattern %in% minstats$pattern),]
 
 
 ###2013 ------------------------------------------------------------------------

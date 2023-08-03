@@ -98,9 +98,6 @@ saveRDS(corp2017, file = "corp2017.RDS")
 corp_2017clean <- expertyears_cleaning(corp = corp2017, pattern = popdictR::gruendl_terms)
 saveRDS(corp_2017_clean, file = "corp_2017_clean.RDS")
 
-
-
-
 pattern <- gruendl_patterns_to_compound()
 
 result2017Clara <- run_weighted_multiword_dict(
@@ -113,7 +110,6 @@ result2017Clara <- run_weighted_multiword_dict(
   include_main_dict = TRUE,
   include_totals = TRUE
 )
-
 
 
 result2017ClaraK <- run_weighted_multiword_dict(
@@ -186,9 +182,6 @@ corp2019 <- corpus(df2019, text_field = "speech_content")
 saveRDS(corp2019, file = "corp2019.RDS")
 corp_2019_clean <- expertyears_cleaning(corp2019, pattern = popdictR::gruendl_terms)
 saveRDS(corp_2019_clean, file = "corp_2019_clean.RDS")
-
-
-
 
 pattern <- gruendl_patterns_to_compound()
 
@@ -280,8 +273,6 @@ gruendl <- round(c(correlation2014$gruendl, correlation2017$gruendl, correlation
 
 clara_mean <- (correlation2014$clara + correlation2017$clara + correlation2019$clara)/3
 clara <- round(c(correlation2014$clara, correlation2017$clara, correlation2019$clara, clara_mean), digits = 3)
-               
-               
 
 claraK_mean <- (correlation2014$claraK + correlation2017$claraK + correlation2019$claraK)/3
 claraK <- round(c(correlation2014$claraK, correlation2017$claraK, correlation2019$claraK, claraK_mean), digits = 3)

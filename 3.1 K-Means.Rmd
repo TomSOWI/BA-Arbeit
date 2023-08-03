@@ -117,8 +117,6 @@ contextBT20$cluster  <- toksBT20$cluster - 1  # cluster two is populism
 dfKmeans <-  rbind(contextBT17,contextBT18,contextBT19,contextBT20) 
 dfKmeans <- aggregate(dfKmeans$cluster, by = list(dfKmeans$pattern), FUN = "mean")
 colnames(dfKmeans) <- c("pattern","weight")
-dfKmeans$pattern <- make_patterns_compound(dfKmeans$pattern) #for merging later
-
 saveRDS(dfKmeans, file = "dfKmeans.RDS")
 
  
@@ -303,9 +301,9 @@ contextBT20$cluster.kmeans.trueK <- toksBT20$cluster.kmeans.trueK
 dfKmeansK <-  rbind(contextBT17,contextBT18,contextBT19,contextBT20) 
 dfKmeansK <- aggregate(dfKmeansK$cluster.kmeans.trueK, by = list(dfKmeansK$pattern), FUN = "mean")
 colnames(dfKmeansK) <- c("pattern","weight")
-dfKmeansK$pattern <- make_patterns_compound(dfKmeansK$pattern) #for merging later
-
 saveRDS(dfKmeansK, file = "dfKmeansK.RDS")
+
+
 ```
 
 

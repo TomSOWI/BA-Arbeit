@@ -20,6 +20,7 @@ library(gt)
 devtools::install_github("jogrue/regexhelpeR")
 devtools::install_github("jogrue/multidictR")
 devtools::install_github("jogrue/popdictR")
+devtools::install_github("TomSOWI/weightdictR")
 
 
 

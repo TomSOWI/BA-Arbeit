@@ -20,6 +20,8 @@ df_kwic2 <- kwic(corp, pattern = d, valuetype = "regex", window = 1, case_insens
 
 t <- kwic(corp, pattern = phrase("\\b(wollen|ein?fordern|möchten|mögen|verlangen|beanspruchen|wünschen) (.*? )?arbeiter(?:innen)?\\b"), valuetype = "regex", window = 2)
 
+
+multidictR::
 ```
 
 ```{r}

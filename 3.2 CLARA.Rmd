@@ -115,7 +115,6 @@ contextBT20$cluster.clara <- toksBT20$cluster.clara
 dfClara <-  rbind(contextBT17,contextBT18,contextBT19,contextBT20)
 dfClara <- aggregate(dfClara$cluster, by = list(dfClara$pattern), FUN = "mean")
 colnames(dfClara) <- c("pattern","weight")
-dfClara$pattern <- make_patterns_compound(dfClara$pattern) #for merging lat
 saveRDS(dfClara, file = "dfClara.RDS")
 
 ```
@@ -273,7 +272,6 @@ contextBT17$cluster.clara.truek <- toksBT17$cluster.clara.truek
 dfClaraK <-  rbind(contextBT17,contextBT18,contextBT19,contextBT20)
 dfClaraK <- aggregate(dfClaraK$cluster.clara.truek, by = list(dfClaraK$pattern), FUN = "mean")
 colnames(dfClaraK) <- c("pattern","weight")
-dfClaraK$pattern <- make_patterns_compound(dfClaraK$pattern) #for merging lat
 saveRDS(dfClaraK, file = "dfClaraK.RDS")
 
 
