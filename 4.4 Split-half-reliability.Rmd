@@ -11,6 +11,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(splithalfr)
 
+
 ```
 
 
@@ -60,23 +61,23 @@ for (i in c(0:1)){
   resultClara1 <- run_weighted_multiword_dict(
     data = toks,
     dict_compound = pattern,
-    dict_name = "gruendl",
+    dict_name = "gruendl1",
     dict_weight = dfClara1,
     dict_weight_name = "clara1",
     prepare_corp = FALSE,
     include_main_dict = T,
-    include_totals = F
+    include_totals = T
   )
   
   resultClara2 <- run_weighted_multiword_dict(
     data = toks,
     dict_compound = pattern,
-    dict_name = "gruendl",
+    dict_name = "gruendl2",
     dict_weight = dfClara2,
     dict_weight_name = "clara2",
     prepare_corp = FALSE,
     include_main_dict = T,
-    include_totals = F
+    include_totals = T
   )
   
   resultClaraK1 <- run_weighted_multiword_dict(
@@ -87,7 +88,7 @@ for (i in c(0:1)){
     dict_weight_name = "claraK1",
     prepare_corp = FALSE,
     include_main_dict = F,
-    include_totals = F
+    include_totals = T
   )
   
   resultClaraK2 <- run_weighted_multiword_dict(
@@ -98,7 +99,7 @@ for (i in c(0:1)){
     dict_weight_name = "claraK2",
     prepare_corp = FALSE,
     include_main_dict = F,
-    include_totals = F
+    include_totals = T
   )
   
   resultKmeans1 <- run_weighted_multiword_dict(
@@ -109,7 +110,7 @@ for (i in c(0:1)){
     dict_weight_name = "kmeans1",
     prepare_corp = FALSE,
     include_main_dict = F,
-    include_totals = F
+    include_totals = T
   )
   
    resultKmeans2 <- run_weighted_multiword_dict(
@@ -120,7 +121,7 @@ for (i in c(0:1)){
     dict_weight_name = "kmeans2",
     prepare_corp = FALSE,
     include_main_dict = F,
-    include_totals = F
+    include_totals = T
   )
    
   resultKmeansK1 <- run_weighted_multiword_dict(
@@ -131,7 +132,7 @@ for (i in c(0:1)){
     dict_weight_name = "kmeansK1",
     prepare_corp = FALSE,
     include_main_dict = F,
-    include_totals = F
+    include_totals = T
   )
   
    resultKmeansK2 <- run_weighted_multiword_dict(
@@ -142,8 +143,19 @@ for (i in c(0:1)){
     dict_weight_name = "kmeansK2",
     prepare_corp = FALSE,
     include_main_dict = F,
-    include_totals = F
+    include_totals = T
   )
+  
+  resultClara1$gruendl1 <- resultClara1$gruendl1/ resultClara1$n_sentences
+  resultClara2$gruendl2 <- resultClara2$gruendl2/ resultClara2$n_sentences
+  resultClara1$clara1 <- resultClara1$clara1/ resultClara1$n_sentences
+  resultClara2$clara2 <- resultClara2$clara2/ resultClara2$n_sentences
+  resultClaraK1$claraK1 <- resultClaraK1$claraK1/ resultClaraK1$n_sentences
+  resultClaraK2$claraK2 <- resultClaraK2$claraK2/ resultClaraK2$n_sentences
+  resultKmeans1$kmeans1 <- resultKmeans1$kmeans1/ resultKmeans1$n_sentences
+  resultKmeans2$kmeans2 <- resultKmeans2$kmeans2/ resultKmeans2$n_sentences
+  resultKmeansK1$kmeansK1 <- resultKmeansK1$kmeansK1/ resultKmeansK1$n_sentences
+  resultKmeansK2$kmeansK2 <- resultKmeansK2$kmeansK2/ resultKmeansK2$n_sentences
   
   sbGruendl <- spearman_brown(resultClara1$gruendl,resultClara2$gruendl)
   sbClara <- spearman_brown(resultClara1$clara1, resultClara2$clara2)
@@ -156,20 +168,484 @@ for (i in c(0:1)){
   reliaClaraK[i] <- sbClaraK
   reliaKmeans[i] <- sbKmeans
   reliaKmeansK[i] <- sbKmeansK
+  
 }
 
-saveRDS(reliaGruendl, file = "reliaGruendl.RDS")
-saveRDS(reliaClara, file = "reliaClara.RDS")
-saveRDS(reliaClaraK, file = "reliaClaraK.RDS")
-saveRDS(reliaKmeansK, file = "reliaKmeansK.RDS")
-saveRDS(reliaKmeans, file = "reliaKmeans.RDS")
+saveRDS(reliaGruendl, file = "reliaGruendl_speeches.RDS")
+saveRDS(reliaClara, file = "reliaClara_speeches.RDS")
+saveRDS(reliaClaraK, file = "reliaClaraK_speeches.RDS")
+saveRDS(reliaKmeansK, file = "reliaKmeansK_speeches.RDS")
+saveRDS(reliaKmeans, file = "reliaKmeans_speeches.RDS")
+
+
+
+```
+
+```{r}
+  check_df_party <- function(df){
+    
+    if (!any(df$party == "CDU/CSU")) {
+      df[nrow(df) + 1,] = list("CDU/CSU",0,0,0,0)
+    }
+    if (!any(df$party == "AfD")){
+      df[nrow(df) + 1,] = list("AfD",0,0,0,0)
+    }
+    if (!any(df$party == "FDP")){
+      df[nrow(df) + 1,] = list("FDP",0,0,0,0)
+    }
+    if (!any(df$party == "SPD")){
+      df[nrow(df) + 1,] = c("SPD",0,0,0,0)
+    }
+    if (!any(df$party == "LINKE")){
+      df[nrow(df) + 1,] = list("LINKE",0,0,0,0)
+    }
+    if (!any(df$party == "Grüne")){
+      df[nrow(df) + 1,] = list("Grüne",0,0,0,0)
+    }
+    df[order(df$party), ]
+    return(df)
+  }
+
+check_df_party1 <- function(df){
+    
+    if (!any(df$party == "CDU/CSU")) {
+      df[nrow(df) + 1,] = list("CDU/CSU",0,0,0,0,0)
+    }
+    if (!any(df$party == "AfD")){
+      df[nrow(df) + 1,] = list("AfD",0,0,0,0,0)
+    }
+    if (!any(df$party == "FDP")){
+      df[nrow(df) + 1,] = list("FDP",0,0,0,0,0)
+    }
+    if (!any(df$party == "SPD")){
+      df[nrow(df) + 1,] = c("SPD",0,0,0,0,0)
+    }
+    if (!any(df$party == "LINKE")){
+      df[nrow(df) + 1,] = list("LINKE",0,0,0,0,0)
+    }
+    if (!any(df$party == "Grüne")){
+      df[nrow(df) + 1,] = list("Grüne",0,0,0,0,0)
+    }
+    df[order(df$party), ]
+    return(df)
+  }
+ 
+  
 
 ```
 
 
+### MP
 
 
 ```{r}
-:
+
+mp <- corp_mp_clean[corp_mp_clean$date == "2013"| corp_mp_clean$date == "2017" | corp_mp_clean$date == "2021",]
+mp <- corpus_to_compound_tokens(corp = mp, pattern = popdictR::gruendl_terms, include_totals = TRUE)
+saveRDS(mp, file = "mpClean.RDS")
+
+
+pattern <- dfClara$pattern
+reliaGruendl <- list()
+reliaClara <- list()
+reliaClaraK <- list()
+reliaKmeans <- list()
+reliaKmeansK <- list()
+
+for (i in c(0:1000)){
+  
+  half_1 <- sample(
+  x = pattern,
+  size = round(length(pattern)/2, 0),
+  replace = FALSE
+  )
+  half_2 <- pattern[!(pattern %in% half_1)]
+
+
+  dfClara1 <- dfClara[dfClara$pattern %in% half_1,]
+  dfClara2 <- dfClara[dfClara$pattern %in% half_2,]
+  dfClaraK1 <- dfClaraK[dfClaraK$pattern %in% half_1,]
+  dfClaraK2 <- dfClaraK[dfClaraK$pattern %in% half_2,]
+  dfKmeans1 <- dfKmeans[dfKmeans$pattern %in% half_1,]
+  dfKmeans2 <- dfKmeans[dfKmeans$pattern %in% half_2,]
+  dfKmeansK1 <- dfKmeansK[dfKmeansK$pattern %in% half_1,]
+  dfKmeansK2 <- dfKmeansK[dfKmeansK$pattern %in% half_2,]
+  
+
+  
+  resultClara1 <- run_weighted_multiword_dict(
+    data = mp,
+    dict_compound = pattern,
+    dict_name = "gruendl1",
+    dict_weight = dfClara1,
+    dict_weight_name = "clara1",
+    prepare_corp = FALSE,
+    include_main_dict = T,
+    include_totals = T
+  )
+  
+  
+  resultClara2 <- run_weighted_multiword_dict(
+    data = mp,
+    dict_compound = pattern,
+    dict_name = "gruendl2",
+    dict_weight = dfClara2,
+    dict_weight_name = "clara2",
+    prepare_corp = FALSE,
+    include_main_dict = T,
+    include_totals = T
+  )
+  
+  resultClaraK1 <- run_weighted_multiword_dict(
+    data = mp,
+    dict_compound = pattern,
+    dict_name = "gruendl",
+    dict_weight = dfClaraK1,
+    dict_weight_name = "claraK1",
+    prepare_corp = FALSE,
+    include_main_dict = F,
+    include_totals = T
+  )
+  
+  resultClaraK2 <- run_weighted_multiword_dict(
+    data = mp,
+    dict_compound = pattern,
+    dict_name = "gruendl1",
+    dict_weight = dfClaraK2,
+    dict_weight_name = "claraK2",
+    prepare_corp = FALSE,
+    include_main_dict = F,
+    include_totals = T
+  )
+  
+  resultKmeans1 <- run_weighted_multiword_dict(
+    data = mp,
+    dict_compound = pattern,
+    dict_name = "gruendl2",
+    dict_weight = dfKmeans1,
+    dict_weight_name = "kmeans1",
+    prepare_corp = FALSE,
+    include_main_dict = F,
+    include_totals = T
+  )
+  
+   resultKmeans2 <- run_weighted_multiword_dict(
+    data = mp,
+    dict_compound = pattern,
+    dict_name = "gruendl",
+    dict_weight = dfKmeans2,
+    dict_weight_name = "kmeans2",
+    prepare_corp = FALSE,
+    include_main_dict = F,
+    include_totals = T
+  )
+   
+  resultKmeansK1 <- run_weighted_multiword_dict(
+    data = mp,
+    dict_compound = pattern,
+    dict_name = "gruendl",
+    dict_weight = dfKmeansK1,
+    dict_weight_name = "kmeansK1",
+    prepare_corp = FALSE,
+    include_main_dict = F,
+    include_totals = T
+  )
+  
+   resultKmeansK2 <- run_weighted_multiword_dict(
+    data = mp,
+    dict_compound = pattern,
+    dict_name = "gruendl",
+    dict_weight = dfKmeansK2,
+    dict_weight_name = "kmeansK2",
+    prepare_corp = FALSE,
+    include_main_dict = F,
+    include_totals = T
+    
+  )
+  resultClara1$gruendl1 <- resultClara1$gruendl1/ resultClara1$n_sentences
+  resultClara2$gruendl2 <- resultClara2$gruendl2/ resultClara2$n_sentences
+  resultClara1$clara1 <- resultClara1$clara1/ resultClara1$n_sentences
+  resultClara2$clara2 <- resultClara2$clara2/ resultClara2$n_sentences
+  resultClaraK1$claraK1 <- resultClaraK1$claraK1/ resultClaraK1$n_sentences
+  resultClaraK2$claraK2 <- resultClaraK2$claraK2/ resultClaraK2$n_sentences
+  resultKmeans1$kmeans1 <- resultKmeans1$kmeans1/ resultKmeans1$n_sentences
+  resultKmeans2$kmeans2 <- resultKmeans2$kmeans2/ resultKmeans2$n_sentences
+  resultKmeansK1$kmeansK1 <- resultKmeansK1$kmeansK1/ resultKmeansK1$n_sentences
+  resultKmeansK2$kmeansK2 <- resultKmeansK2$kmeansK2/ resultKmeansK2$n_sentences
+  
+
+  resultClara1 <- check_df_party1(resultClara1)
+  resultClara2 <- check_df_party1(resultClara2)
+  resultClaraK1 <- check_df_party(resultClaraK1)
+  resultClaraK2 <- check_df_party(resultClaraK2)
+  resultKmeans1 <-check_df_party(resultKmeans1)
+  resultKmeans2 <-check_df_party(resultKmeans2)
+  resultKmeansK1 <-check_df_party(resultKmeansK1)
+  resultKmeansK2 <-check_df_party(resultKmeansK2)
+  
+  sbGruendl <- spearman_brown(resultClara1$gruendl,resultClara2$gruendl)
+  sbClara <- spearman_brown(resultClara1$clara1, resultClara2$clara2)
+  sbClaraK <- spearman_brown(resultClaraK1$claraK1, resultClaraK2$claraK2)
+  sbKmeans <- spearman_brown(resultKmeans1$kmeans1, resultKmeans2$kmeans2)
+  sbKmeansK <- spearman_brown(resultKmeansK1$kmeansK1, resultKmeansK2$kmeansK2)
+  
+  reliaGruendl[i] <- sbGruendl
+  reliaClara[i] <- sbClara
+  reliaClaraK[i] <- sbClaraK
+  reliaKmeans[i] <- sbKmeans
+  reliaKmeansK[i] <- sbKmeansK
+  
+}
+
+saveRDS(reliaGruendl, file = "reliaGruendl_mp.RDS")
+saveRDS(reliaClara, file = "reliaClara_mp.RDS")
+saveRDS(reliaClaraK, file = "reliaClaraK_mp.RDS")
+saveRDS(reliaKmeansK, file = "reliaKmeansK_mp.RDS")
+saveRDS(reliaKmeans, file = "reliaKmeans_mp.RDS")
+
+```
+### Short dict
+
+```{r}
+pattern <- dfClara10$pattern
+
+reliaGruendl_mp10 <- list()
+reliaClara_mp10 <- list()
+reliaClaraK_mp10 <- list()
+reliaKmeans_mp10 <- list()
+reliaKmeansK_mp10 <- list()
+
+reliaGruendl_speeches10 <- list()
+reliaClara_speeches10 <- list()
+reliaClaraK_speeches10 <- list()
+reliaKmeans_speeches10 <- list()
+reliaKmeansK_speeches10 <- list()
+
+for (i in c(0:1000)){
+  
+  half_1 <- sample(
+  x = pattern,
+  size = round(length(pattern)/2, 0),
+  replace = FALSE
+  )
+  half_2 <- pattern[!(pattern %in% half_1)]
+
+
+  dfClara10_1 <- dfClara10[dfClara10$pattern %in% half_1,]
+  dfClara10_2 <- dfClara[dfClara$pattern %in% half_2,]
+
+  
+  ### MP -----------------------------------------------------------------------
+  
+  resultClara10_1_mp <- run_weighted_multiword_dict(
+  data = mp,
+  dict_compound = pattern,
+  dict_name = "gruendl10_1",
+  dict_weight = dfClara10_1,
+  dict_weight_name = "clara10_1",
+  prepare_corp = FALSE,
+  include_main_dict = T,
+  include_totals = T
+  )
+  
+  resultClara10_2_mp <- run_weighted_multiword_dict(
+  data = mp,
+  dict_compound = pattern,
+  dict_name = "gruendl10_2",
+  dict_weight = dfClara10_2,
+  dict_weight_name = "clara10_2",
+  prepare_corp = FALSE,
+  include_main_dict = T,
+  include_totals = T
+  )
+  
+  resultClara10_1_mp$gruendl10_1 <- resultClara10_1_mp$gruendl10_1/ resultClara10_1_mp$n_sentences
+  resultClara10_2_mp$gruendl10_2 <- resultClara10_2_mp$gruendl10_2/ resultClara10_2_mp$n_sentences
+  resultClara10_1_mp$clara10_1 <- resultClara10_1_mp$clara10_1/ resultClara10_1_mp$n_sentences
+  resultClara10_2_mp$clara10_2 <- resultClara10_2_mp$clara10_2/ resultClara10_2_mp$n_sentences
+  
+  resultClara10_1_mp <- check_df_party1(resultClara10_1_mp)
+  resultClara10_2_mp <- check_df_party1(resultClara10_2_mp)
+  
+  sbGruendl10_mp <- spearman_brown(resultClara10_1_mp$gruendl10_1,resultClara10_2_mp$gruendl10_2)
+  sbClara10_mp <- spearman_brown(resultClara10_1_mp$clara10_1, resultClara10_2_mp$clara10_2)
+  
+  reliaGruendl_mp10[i] <- sbGruendl10_mp
+  reliaClara_mp10[i] <- sbClara10_mp
+  
+  
+  
+  ### Speeches ----------------------------------------------------------------  
+  
+  resultClara10_1_speeches <- run_weighted_multiword_dict(
+  data = toks,
+  dict_compound = pattern,
+  dict_name = "gruendl10_1",
+  dict_weight = dfClara10_1,
+  dict_weight_name = "clara10_1",
+  prepare_corp = FALSE,
+  include_main_dict = T,
+  include_totals = T
+  )
+  
+  resultClara10_2_speeches <- run_weighted_multiword_dict(
+  data = toks,
+  dict_compound = pattern,
+  dict_name = "gruendl10_2",
+  dict_weight = dfClara10_2,
+  dict_weight_name = "clara10_2",
+  prepare_corp = FALSE,
+  include_main_dict = T,
+  include_totals = T
+  )
+  
+  resultClara10_1_speeches$gruendl10_1 <- resultClara10_1_speeches$gruendl10_1/ resultClara10_1_speeches$n_sentences
+  resultClara10_2_speeches$gruendl10_2 <- resultClara10_2_speeches$gruendl10_2/ resultClara10_2_speeches$n_sentences
+  resultClara10_1_speeches$clara10_1 <- resultClara10_1_speeches$clara10_1/ resultClara10_1_speeches$n_sentences
+  resultClara10_2_speeches$clara10_2 <- resultClara10_2_speeches$clara10_2/ resultClara10_2_speeches$n_sentences
+  
+  resultClara10_1_speeches <- check_df_party1(resultClara10_1_speeches)
+  resultClara10_2_speeches <- check_df_party1(resultClara10_2_speeches)
+  
+  sbGruendl10_speeches <- spearman_brown(resultClara10_1_speeches$gruendl10_1,resultClara10_2_speeches$gruendl10_2)
+  sbClara10_speeches <- spearman_brown(resultClara10_1_speeches$clara10_1, resultClara10_2_speeches$clara10_2)
+  
+  reliaGruendl_speeches10[i] <- sbGruendl10_speeches
+  reliaClara_speeches10[i] <- sbClara10_speeches
+  
+}
+
+saveRDS(reliaGruendl_mp10, file = "reliaGruendl_mp10.RDS")
+saveRDS(reliaClara_mp10, file = "reliaClara_mp10.RDS")
+saveRDS(reliaGruendl_speeches10, file = "reliaGruendl_speeches10.RDS")
+saveRDS(reliaClara_speeches10, file = "reliaClara_speeches10.RDS")
+
+
+
+```
+
+## Reliabilität
+
+#### Speeches
+
+```{r}
+speechesRelia <- data.frame(gruendl = unlist(reliaGruendl), clara = unlist(reliaClara), claraK = unlist(reliaClaraK), kmeans = unlist(reliaKmeans), kmeansK = unlist(reliaKmeansK))
+
+df_long <- pivot_longer(speechesRelia, cols = 1:5, names_to = "Diktionäre", values_to = "relia")
+
+ggplot(df_long, aes(Diktionäre, relia))+
+  geom_boxplot()+
+  scale_y_continuous(limits = c(0,1))
+
+
+dfMean <- speechesRelia %>%
+  reframe(
+    gruendl = mean(gruendl),
+    clara = mean(clara),
+    claraK = mean(claraK),
+    kmeans = mean(kmeans),
+    kmeansK = mean(kmeansK)
+  )
+    
+dfMin <- speechesRelia %>%
+  reframe(
+    gruendl = min(gruendl),
+    clara = min(clara),
+    claraK = min(claraK),
+    kmeans = min(kmeans),
+    kmeansK = min(kmeansK)
+  )
+
+
+```
+
+#### MP
+
+```{r}
+mpRelia <- data.frame(gruendl = unlist(reliaGruendl_mp), clara = unlist(reliaClara_mp), claraK = unlist(reliaClaraK_mp), kmeans = unlist(reliaKmeans_mp), kmeansK = unlist(reliaKmeansK_mp))
+
+df_long <- pivot_longer(mpRelia, cols = 1:5, names_to = "Diktionäre", values_to = "relia")
+
+ggplot(df_long, aes(Diktionäre, relia))+
+  geom_boxplot()+
+  scale_y_continuous(limits = c(0,1))
+
+dfMean <- mpRelia  %>%
+  reframe(
+    gruendl = mean(gruendl),
+    clara = mean(clara),
+    claraK = mean(claraK),
+    kmeans = mean(kmeans),
+    kmeansK = mean(kmeansK)
+  )
+    
+dfMin <- mpRelia  %>%
+  reframe(
+    gruendl = min(gruendl),
+    clara = min(clara),
+    claraK = min(claraK),
+    kmeans = min(kmeans),
+    kmeansK = min(kmeansK)
+  )
+
+```
+
+### short dict
+
+#### Speeches
+
+```{r}
+speeches10Relia <- data.frame(gruendl = unlist(reliaGruendl), clara = unlist(reliaClara), gruendl_10 = unlist(reliaGruendl_speeches10), clara_10 = unlist(reliaClara_speeches10))
+
+df_long <- pivot_longer(speeches10Relia, cols = 1:4, names_to = "Diktionäre", values_to = "relia")
+
+ggplot(df_long, aes(Diktionäre, relia))+
+  geom_boxplot()+
+  scale_y_continuous(limits = c(0,1))
+                              
+dfMean <- speeches10Relia  %>%
+  reframe(
+    gruendl = mean(gruendl),
+    gruendl_10 = mean(gruendl_10),
+    clara = mean(clara),
+    clara_10 = mean(clara_10)
+  )
+    
+dfMin <- speeches10Relia  %>%
+  reframe(
+    gruendl = min(gruendl),
+    gruendl_10 = min(gruendl_10),
+    clara = min(clara),
+    clara_10 = min(clara_10)
+  )
+```
+
+#### MP
+
+```{r}
+mp10Relia <- data.frame(gruendl = unlist(reliaGruendl_mp), clara = unlist(reliaClara_mp), gruendl_10 = unlist(reliaGruendl_mp10), clara_10 = unlist(reliaClara_mp10))
+
+df_long <- pivot_longer(mp10Relia, cols = 1:4, names_to = "Diktionäre", values_to = "relia")
+
+ggplot(df_long, aes(Diktionäre, relia))+
+  geom_boxplot()+
+  scale_y_continuous(limits = c(0,1))
+
+dfMean <- mp10Relia   %>%
+  reframe(
+    gruendl = mean(gruendl),
+    gruendl_10 = mean(gruendl_10),
+    clara = mean(clara),
+    clara_10 = mean(clara_10)
+  )
+    
+dfMin <- mp10Relia   %>%
+  reframe(
+    gruendl = min(gruendl),
+    gruendl_10 = min(gruendl_10),
+    clara = min(clara),
+    clara_10 = min(clara_10)
+  )
+
 ```
 
