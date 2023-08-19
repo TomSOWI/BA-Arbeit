@@ -185,6 +185,30 @@ saveRDS(reliaKmeans, file = "reliaKmeans_speeches.RDS")
   check_df_party <- function(df){
     
     if (!any(df$party == "CDU/CSU")) {
+      df[nrow(df) + 1,] = list("CDU/CSU",0,0,0)
+    }
+    if (!any(df$party == "AfD")){
+      df[nrow(df) + 1,] = list("AfD",0,0,0)
+    }
+    if (!any(df$party == "FDP")){
+      df[nrow(df) + 1,] = list("FDP",0,0,0)
+    }
+    if (!any(df$party == "SPD")){
+      df[nrow(df) + 1,] = c("SPD",0,0,0)
+    }
+    if (!any(df$party == "LINKE")){
+      df[nrow(df) + 1,] = list("LINKE",0,0,0)
+    }
+    if (!any(df$party == "Grüne")){
+      df[nrow(df) + 1,] = list("Grüne",0,0,0)
+    }
+    df[order(df$party), ]
+    return(df)
+  }
+
+check_df_party1 <- function(df){
+    
+    if (!any(df$party == "CDU/CSU")) {
       df[nrow(df) + 1,] = list("CDU/CSU",0,0,0,0)
     }
     if (!any(df$party == "AfD")){
@@ -201,30 +225,6 @@ saveRDS(reliaKmeans, file = "reliaKmeans_speeches.RDS")
     }
     if (!any(df$party == "Grüne")){
       df[nrow(df) + 1,] = list("Grüne",0,0,0,0)
-    }
-    df[order(df$party), ]
-    return(df)
-  }
-
-check_df_party1 <- function(df){
-    
-    if (!any(df$party == "CDU/CSU")) {
-      df[nrow(df) + 1,] = list("CDU/CSU",0,0,0,0,0)
-    }
-    if (!any(df$party == "AfD")){
-      df[nrow(df) + 1,] = list("AfD",0,0,0,0,0)
-    }
-    if (!any(df$party == "FDP")){
-      df[nrow(df) + 1,] = list("FDP",0,0,0,0,0)
-    }
-    if (!any(df$party == "SPD")){
-      df[nrow(df) + 1,] = c("SPD",0,0,0,0,0)
-    }
-    if (!any(df$party == "LINKE")){
-      df[nrow(df) + 1,] = list("LINKE",0,0,0,0,0)
-    }
-    if (!any(df$party == "Grüne")){
-      df[nrow(df) + 1,] = list("Grüne",0,0,0,0,0)
     }
     df[order(df$party), ]
     return(df)
@@ -421,7 +421,7 @@ reliaClaraK_speeches10 <- list()
 reliaKmeans_speeches10 <- list()
 reliaKmeansK_speeches10 <- list()
 
-for (i in c(0:1000)){
+for (i in c(0:1)){
   
   half_1 <- sample(
   x = pattern,
@@ -529,13 +529,14 @@ saveRDS(reliaClara_speeches10, file = "reliaClara_speeches10.RDS")
 #### Speeches
 
 ```{r}
-speechesRelia <- data.frame(gruendl = unlist(reliaGruendl), clara = unlist(reliaClara), claraK = unlist(reliaClaraK), kmeans = unlist(reliaKmeans), kmeansK = unlist(reliaKmeansK))
+speechesRelia <- data.frame(gruendl = unlist(reliaGruendl_speeches), clara = unlist(reliaClara_speeches), claraK = unlist(reliaClaraK_speeches), kmeans = unlist(reliaKmeans_speeches), kmeansK = unlist(reliaKmeansK_speeches))
 
 df_long <- pivot_longer(speechesRelia, cols = 1:5, names_to = "Diktionäre", values_to = "relia")
 
 ggplot(df_long, aes(Diktionäre, relia))+
   geom_boxplot()+
-  scale_y_continuous(limits = c(0,1))
+  ylab("Split-Half Reliabilität")
+  #scale_y_continuous(limits = c(0,1))
 
 
 dfMean <- speechesRelia %>%
@@ -555,6 +556,109 @@ dfMin <- speechesRelia %>%
     kmeans = min(kmeans),
     kmeansK = min(kmeansK)
   )
+```
+
+
+```{r}
+
+ "%||%" <- function(a, b) {
+        if (!is.null(a)) a else b
+ }
+
+ggname <- function(prefix, grob) {
+        grob$name <- grobName(grob, prefix)
+        grob
+      }
+
+      geom_flat_violin <- function(mapping = NULL, data = NULL, stat = "ydensity",
+                                   position = "dodge", trim = TRUE, scale = "area",
+                                   show.legend = NA, inherit.aes = TRUE, ...) {
+        layer(
+          data = data,
+          mapping = mapping,
+          stat = stat,
+          geom = GeomFlatViolin,
+          position = position,
+          show.legend = show.legend,
+          inherit.aes = inherit.aes,
+          params = list(
+            trim = trim,
+            scale = scale,
+            ...
+          )
+        )
+      }
+
+      GeomFlatViolin <-
+        ggproto("GeomFlatViolin", Geom,
+                setup_data = function(data, params) {
+                  data$width <- data$width %||%
+                    params$width %||% (resolution(data$x, FALSE) * 0.9)
+
+                  # ymin, ymax, xmin, and xmax define the bounding rectangle for each group
+                  data %>%
+                    dplyr::group_by(group) %>%
+                    dplyr::mutate(ymin = min(y),
+                           ymax = max(y),
+                           xmin = x,
+                           xmax = x + width / 2)
+
+                },
+
+                draw_group = function(data, panel_scales, coord) {
+                  # Find the points for the line to go all the way around
+                  data <- transform(data, xminv = x,
+                                    xmaxv = x + violinwidth * (xmax - x))
+
+                  # Make sure it's sorted properly to draw the outline
+                  newdata <- rbind(plyr::arrange(transform(data, x = xminv), y),
+                                   plyr::arrange(transform(data, x = xmaxv), -y))
+
+                  # Close the polygon: set first and last point the same
+                  # Needed for coord_polar and such
+                  newdata <- rbind(newdata, newdata[1,])
+
+                  ggname("geom_flat_violin", GeomPolygon$draw_panel(newdata, panel_scales, coord))
+                },
+
+                draw_key = draw_key_polygon,
+
+                default_aes = aes(weight = 1, colour = "grey20", fill = "white", size = 0.5,
+                                  alpha = NA, linetype = "solid"),
+
+                required_aes = c("x", "y")
+        )
+```
+
+
+```{r}
+custombox1 <- function(y){
+        d <- data.frame(ymin=min(y),
+                        lower=quantile(y,0.025),
+                        middle=mean(y),
+                        upper=quantile(y,0.975),
+                        ymax=max(y),
+                        y=y,
+                        width=0.07,
+                        row.names = NULL
+        )
+        d[1, ]
+}
+```
+
+
+```{r}
+ggplot(data = df_long,aes(x = Diktionäre , y = relia, fill = Diktionäre)) +
+        geom_flat_violin(position = position_nudge(x = .2)) +
+        geom_jitter(width = .1, alpha = .3, size = .5) +
+        stat_summary(fun.data = custombox1, geom = "boxplot",
+                     position = position_nudge(x = .2),
+                     alpha = .2, colour = "BLACK", size = .75) +
+        theme(legend.position = "none") +
+        labs(y = "estimate") +
+        geom_text(data = df_long,
+                  aes(label = relia, group = Diktionäre),
+                  stat = "identity", position = position_nudge(x = .35))
 
 
 ```
@@ -568,7 +672,9 @@ df_long <- pivot_longer(mpRelia, cols = 1:5, names_to = "Diktionäre", values_to
 
 ggplot(df_long, aes(Diktionäre, relia))+
   geom_boxplot()+
-  scale_y_continuous(limits = c(0,1))
+  ylab("Split-Half Reliabilität")
+ # scale_y_continuous(limits = c(0,1))
+  
 
 dfMean <- mpRelia  %>%
   reframe(
@@ -588,6 +694,11 @@ dfMin <- mpRelia  %>%
     kmeansK = min(kmeansK)
   )
 
+
+
+
+
+
 ```
 
 ### short dict
@@ -595,13 +706,15 @@ dfMin <- mpRelia  %>%
 #### Speeches
 
 ```{r}
-speeches10Relia <- data.frame(gruendl = unlist(reliaGruendl), clara = unlist(reliaClara), gruendl_10 = unlist(reliaGruendl_speeches10), clara_10 = unlist(reliaClara_speeches10))
+speeches10Relia <- data.frame(gruendl = unlist(reliaGruendl_speeches), clara = unlist(reliaClara_speeches), gruendl_10 = unlist(reliaGruendl_speeches10), clara_10 = unlist(reliaClara_speeches10))
 
 df_long <- pivot_longer(speeches10Relia, cols = 1:4, names_to = "Diktionäre", values_to = "relia")
 
 ggplot(df_long, aes(Diktionäre, relia))+
   geom_boxplot()+
-  scale_y_continuous(limits = c(0,1))
+  ylab("Split-Half Reliabilität")
+
+  #scale_y_continuous(limits = c(0,1))
                               
 dfMean <- speeches10Relia  %>%
   reframe(
@@ -629,7 +742,8 @@ df_long <- pivot_longer(mp10Relia, cols = 1:4, names_to = "Diktionäre", values_
 
 ggplot(df_long, aes(Diktionäre, relia))+
   geom_boxplot()+
-  scale_y_continuous(limits = c(0,1))
+  ylab("Split-Half Reliabilität")
+  #scale_y_continuous(limits = c(0,1))
 
 dfMean <- mp10Relia   %>%
   reframe(

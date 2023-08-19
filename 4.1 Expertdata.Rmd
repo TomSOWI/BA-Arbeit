@@ -185,7 +185,7 @@ expResults$`2019_z` <- round(expResults$`2019_z`, digits = 2)
 
 gtExpert <- gt(expResults) %>%  
   tab_header(
-   title = "Tabelle 1: Populismuseinordnung der Parteien nach Expertenbefragungen")
-   #gtsave("gtValidation.tex")
+   title = "Tabelle 1: Populismuseinordnung der Parteien nach Expertenbefragungen")%>%
+   gtsave("gtExperts.tex")
 ```
  
