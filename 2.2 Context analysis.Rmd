@@ -6,6 +6,21 @@ output: html_document
 ---
 
 ```{r}
+textplot <- function(text, min_freq = 25){
+  text <- gsub("dass","",text)
+  
+  dtm <- dfm(text) %>%
+    dfm(remove = stopwords('german')) %>%
+    dfm_wordstem() %>%
+    dfm_trim(min_termfreq = min_freq , verbose = FALSE)
+  
+  set.seed(100)
+  textplot_wordcloud(dtm)
+  
+}
+```
+
+```{r}
 contextBT18 <- readRDS("~/Documents/Uni Stuttgart/BachelorarbeitPopulismus/Code/Contextdaten/contextBT18.RDS")
 contextBT18$context <- gsub("dass","",contextBT18$context)
 
@@ -17,6 +32,7 @@ dtmBT18 <- dfm(contextBT18$context) %>%
 set.seed(100)
 textplot_wordcloud(dtmBT18)
 ```
+
 ```{r}
 textplot(contextBT17$context, min_freq = 50)
 ```
@@ -24,8 +40,6 @@ textplot(contextBT17$context, min_freq = 50)
 
 ```{r}
 textplot(contextBT18$context, min_freq = 25)
- 
-  
 ```
 
 ```{r}

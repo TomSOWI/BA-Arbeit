@@ -5,13 +5,10 @@ date: "3 5 2023"
 output: html_document
 ---
  
-### Preprocessing
- 
-### Main dict
 
 
 ##########################
-#Pre_processing updated
+## Pre_processing 
 ##########################
 
 

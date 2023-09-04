@@ -15,8 +15,6 @@ output: html_document
 ##############################
 
 
-
-
 ```{r}
 toksBT17 <- contextBT17_clean
 toksBT17$party <- contextBT17$party

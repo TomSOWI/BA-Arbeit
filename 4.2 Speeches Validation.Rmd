@@ -196,8 +196,6 @@ result2019Clara <- run_weighted_multiword_dict(
   include_totals = TRUE
 )
 
-
-
 result2019ClaraK <- run_weighted_multiword_dict(
   data = corp_2019_clean,
   dict_compound = pattern,
@@ -285,7 +283,6 @@ kmeansK <- round(c(correlation2014$kmeansK, correlation2017$kmeansK, correlation
 
 
 dfValidation <- data.frame(Jahr,gruendl,clara,claraK,kmeans,kmeansK)
-
 
 gtValidation <- gt(dfValidation,rowname_col = "Jahre") %>%  
   tab_header(

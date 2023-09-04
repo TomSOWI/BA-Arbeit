@@ -14,19 +14,10 @@ output: html_document
 # Prepare manifesto corpus
 #############################################################
 
-N-gramme identifizieren --> done
-cleaning
-compund
-regex-überarbeitung
-stats überarbeitung ntokens/nsentences
 
-
-
-
-#############################################################
-# N-Gram
-#############################################################
-
+##########################
+## N-Gram
+##########################
 
 
 ```{r}
@@ -49,11 +40,14 @@ term_ngram
 #############################################################
 
 ```{r}
+
 manifestoR::mp_setapikey("./Expertendaten/manifesto_apikey.txt")
+manifestoR::mp_cite()
 
 election_programmes <- mp_corpus(countryname == "Germany")
 corp_mp <- corpus(election_programmes)
-#
+#manifestoR::mp_cite()
+
 corp_mp <- corp_mp[corp_mp$party %in% c(41521,41320,41953,41420,41223,41113)]
 corp_mp$date <- as.numeric(str_sub(corp_mp$date, start = 1, end = 4))
 corp_mp <- corp_mp[corp_mp$date >="2013",]
@@ -74,23 +68,8 @@ corp_mp_clean <- gsub("NA", "", corp_mp_clean)
 corp_mp_clean <- gsub("\", \"", " ", corp_mp_clean)
 corp_mp_clean <- gsub("\"", "", corp_mp_clean)
 corp_mp_clean <- gsub("[[:digit:]]", "", corp_mp_clean)
-#corp_mp_clean <- gsub("(", "", corp_mp_clean)
-#corp_mp_clean <- gsub("c(\", "", corp_mp_clean)
-
-
-
-
-#corp_mp_clean[[6]]
-
-#corp_mp_clean[[9]]
 ```
 
-
-
-
-#############################################################
-# 2013{2014}
-#############################################################
 
 
 ```{r}
