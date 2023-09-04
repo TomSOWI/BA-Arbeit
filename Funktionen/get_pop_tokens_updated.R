@@ -1,4 +1,9 @@
 
+#############################################################
+# Disclaimer:
+## This is a function developed by Gründl 2022 https://github.com/jogrue/multidictR 
+## I just fixed a bug that occured for me when running the function
+#############################################################
 
 
 get_pop_tokens_updated <- function(
@@ -17,7 +22,7 @@ get_pop_tokens_updated <- function(
   # Create compounds if param is set
   if (create_compounds & !is.null(compounds_dict)) {
     # Compounds are created
-    text <- make_compounds1( #Meine Änderung
+    text <- make_compounds1( 
       text = text,
       patterns = compounds_dict,
       at_level = compounds_at_level,

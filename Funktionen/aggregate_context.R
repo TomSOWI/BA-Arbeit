@@ -6,7 +6,7 @@ aggregate_context <- function(tokens, dict_compound){
   
   party <- data.frame(docname = docnames(tokens), party = docvars(tokens)$party )
   #
-  df_kwic <- merge(df_kwic, party, by = "docname") #prüfen ob das klappt
+  df_kwic <- merge(df_kwic, party, by = "docname") 
   #
   return(df_kwic)
 }

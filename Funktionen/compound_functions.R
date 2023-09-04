@@ -1,15 +1,11 @@
 
 
 
-
-
-
-
-
-
-
-
-
+#############################################################
+# Disclaimer:
+## This is a function developed by Gründl 2022 https://github.com/jogrue/multidictR 
+## I just fixed a bug that occured for me when running the function
+#############################################################
 
 
 .create_single_compound <- function(compound, wordsep = " ", concatenator = "_") {
@@ -143,7 +139,7 @@ make_compounds1 <- function(
   }
   
   # Reshape corpus to apply patterns at specified level
-  old_level <- quanteda::meta(text, type = "all")$unit
+  old_level <- quanteda::meta(text, type = "all")$unit #my change
   if (is.null(old_level)) {
     # Older corpus objects do not have the unit meta field -> update corpus
     warning(paste0('Corpus did not include the "unit" meta field. ',
